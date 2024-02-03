@@ -2,7 +2,7 @@ package com.example.springbackend.controller;
 import com.example.springbackend.Exception.UserNotFoundException;
 import com.example.springbackend.Service.JoinService;
 import com.example.springbackend.Entity.User;
-import com.example.springbackend.model.JoinDto;
+import com.example.springbackend.DTO.JoinDto;
 import com.example.springbackend.repo.UserRepo;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,13 +32,13 @@ public class UserController {
     }
 
     @GetMapping("user/{id}")
-    User getUserById(@PathVariable Long id){
+    User getUserById(@PathVariable(name = "id") Long id){
         return userRepository.findById(id)
                 .orElseThrow(()-> new UserNotFoundException(id));
     }
 
     @PutMapping("updateUser/{id}")
-    User updateUser(@RequestBody User newUser,@PathVariable Long id){
+    User updateUser(@RequestBody User newUser,@PathVariable(name = "id") Long id){
         return userRepository.findById(id)
                 .map(user ->{
                     user.setUsername(newUser.getUsername());
@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @DeleteMapping("deleteUser/{id}")
-    String deleteuserById(@PathVariable Long id){
+    String deleteuserById(@PathVariable(name = "id") Long id){
         if (!userRepository.existsById(id)){
             throw new UserNotFoundException(id);
         };
@@ -59,8 +59,5 @@ public class UserController {
         return "User id"+id+"delete success";
 
     }
-
-
-
 
 }

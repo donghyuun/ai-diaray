@@ -1,6 +1,6 @@
 package com.example.springbackend.Service;
 
-import com.example.springbackend.model.CustomUserDetails;
+import com.example.springbackend.DTO.CustomUserDetails;
 import com.example.springbackend.Entity.User;
 import com.example.springbackend.repo.UserRepo;
 import org.springframework.security.core.userdetails.UserDetails;

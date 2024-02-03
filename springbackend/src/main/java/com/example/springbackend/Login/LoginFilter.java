@@ -1,6 +1,6 @@
 package com.example.springbackend.Login;
 
-import com.example.springbackend.model.CustomUserDetails;
+import com.example.springbackend.DTO.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -66,7 +66,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         System.out.println("login fail");
-        response.setStatus(401);
-
+        response.setStatus(200);
     }
 }

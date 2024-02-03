@@ -1,6 +1,6 @@
 package com.example.springbackend.Login;
 
-import com.example.springbackend.model.CustomUserDetails;
+import com.example.springbackend.DTO.CustomUserDetails;
 import com.example.springbackend.Entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

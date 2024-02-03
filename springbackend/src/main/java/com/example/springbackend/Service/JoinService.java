@@ -1,6 +1,6 @@
 package com.example.springbackend.Service;
 
-import com.example.springbackend.model.JoinDto;
+import com.example.springbackend.DTO.JoinDto;
 import com.example.springbackend.Entity.User;
 import com.example.springbackend.repo.UserRepo;
 
@@ -36,6 +36,7 @@ public class JoinService {
         user.setName(name);
         user.setUsername(username);
         user.setPassword(bCryptPasswordEncoder.encode(password));
+//        user.setPassword(password);
         user.setEmail(email);
         user.setRole("ROLE_ADMIN");
 

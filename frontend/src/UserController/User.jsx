@@ -20,6 +20,7 @@ function User() {
     const [editUserID, setEditUserId] = useState();
     const [useridforDelete, setuseridforDelete] = useState();
     const [updateuser,setupdateuser]=useState([]);
+    const [isLogined, setIsLogined] = useState(false);
 
     const [user, setUser] = useState({
         name: '',
@@ -56,6 +57,13 @@ function User() {
 
     const handleLoginUser = () => {
         setshowModalLoginuser(true);
+    };
+
+    const handleLogoutUser = () => {
+        setIsLogined(false);
+        localStorage.removeItem("key");
+        setmessage("로그아웃되었습니다.")
+        setalertColor("success");
     };
 
     const handleEditUser = () => {
@@ -110,15 +118,27 @@ function User() {
         // 헤더에서 토큰 추출
         let token = response.headers['authorization'];
         // // 토큰을 localStorage에 set
-        token = token.split(" ")[1];
-        localStorage.setItem("key", token);
-        const getToken = localStorage.getItem("key");
-        console.log('Token:', getToken);
-        console.log(response.headers);
 
-        console.log('User Login Success');
-        setmessage('User Logined');
-        setalertColor("success")
+        if(typeof token == "undefined" || token == null){
+            console.log('User Login Failed');
+            setmessage('User Login Failed');
+            setalertColor("error")
+        }else{
+            token = token.split(" ")[1];
+            localStorage.setItem("key", token);
+            const getToken = localStorage.getItem("key");
+            console.log('Token:', getToken);
+            console.log(response.headers);
+
+            console.log('User Login Success');
+            // setmessage('User Logined');
+            setalertColor("success")
+
+            let payload = token.substring(token.indexOf('.')+1,token.lastIndexOf('.'));
+            let dec = JSON.parse(atob(payload));
+            setmessage(`${dec.username} 님 반갑습니다.`);
+            setIsLogined(true);
+        }
         handleCloseModal();
     };
 
@@ -157,9 +177,16 @@ function User() {
                 <Alertmessage message={message} bg={alertColor} />
             </div>
             <div className='d-flex'>
-                <Button variant="primary" onClick={handleLoginUser}>
-                    Login
-                </Button>
+                {isLogined ? (
+                    <Button variant="primary" onClick={handleLogoutUser}>
+                        Logout
+                    </Button>
+                    ) :
+                    (
+                        <Button variant="primary" onClick={handleLoginUser}>
+                            Login
+                        </Button>
+                    )}
             </div>
             <div className='mt-2'>
                 {/*<Alertmessage message={message} bg={alertColor} />*/}
