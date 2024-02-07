@@ -7,9 +7,9 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Alertmessage from '../component/Alertmessage';
 
-function User() {
+function Board() {
 
-    const [users, setUsers] = useState([]);
+    const [boards, setBoards] = useState([]);
     const [showModalAdduser, setshowModalAdduser] = useState(false);
     const [showModalLoginuser, setshowModalLoginuser] = useState(false);
     const [showModalEdituser, setshowModalEdituser] = useState(false);
@@ -20,6 +20,7 @@ function User() {
     const [useridforDelete, setuseridforDelete] = useState();
     const [updateuser,setupdateuser]=useState([]);
     const [isLogined, setIsLogined] = useState(false);
+    const [post, setPost] = useState([]);
 
 
     const [user, setUser] = useState({
@@ -43,12 +44,12 @@ function User() {
     });
 
     useEffect(() => {
-        getUsers();
+        getBoards();
     }, []);
 
-    const getUsers = async () => {
-        const result = await axios.get('http://localhost:8080/users');
-        setUsers(result.data);
+    const getBoards = async () => {
+        const result = await axios.get('http://localhost:8080/board');
+        setBoards(result.data);
     };
 
     const handleAddUser = () => {
@@ -82,7 +83,7 @@ function User() {
     };
 
     const onInputChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+        setPost({ ...post, [e.target.name]: e.target.value });
     };
 
     const onLoginInputChange = (e) => {
@@ -96,11 +97,11 @@ function User() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8080/user', user);
-        console.log('User added');
-        setmessage('New user Added');
+        await axios.post('http://localhost:8080/board/write', post);
+        console.log('Post added');
+        setmessage('New post Added');
         setalertColor("success")
-        getUsers(); // Fetch users again after adding a new user
+        getBoards(); // Fetch users again after adding a new user
         handleCloseModal();
     };
 
@@ -151,7 +152,7 @@ function User() {
         setmessage('User update success');
         setalertColor('info')
         console.log(edituser);
-        getUsers(); // Fetch users again after adding a new user
+        getBoards(); // Fetch users again after adding a new user
         handleCloseModal();
     };
 
@@ -162,7 +163,7 @@ function User() {
         setmessage('user deleted');
         setalertColor('warning')
         console.log('User Deleted');
-        getUsers(); // Fetch users again after adding a new user
+        getBoards(); // Fetch users again after adding a new user
     }
 
 
@@ -171,7 +172,7 @@ function User() {
             <span>
                 <div className='d-flex'>
                 <Button variant="primary" onClick={handleAddUser}>
-                    Add User
+                    Add Post
                 </Button>
             </div>
             <div className='mt-2'>
@@ -179,9 +180,9 @@ function User() {
             </div>
             <div className='d-flex'>
                 {isLogined ? (
-                    <Button variant="primary" onClick={handleLogoutUser}>
-                        Logout
-                    </Button>
+                        <Button variant="primary" onClick={handleLogoutUser}>
+                            Logout
+                        </Button>
                     ) :
                     (
                         <Button variant="primary" onClick={handleLoginUser}>
@@ -196,31 +197,31 @@ function User() {
             <div className="Usertable mt-4">
                 <Table className="shadow">
                     <thead className="bg-warning text-white">
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>User name</th>
-                            <th>Email</th>
-                            <th>Password</th>
-                            <th>Action</th>
-                        </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>User name</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Created Date</th>
+                        <th>Modified Date</th>
+                    </tr>
                     </thead>
                     <tbody className="bg-light">
-                        {users.map((user, index) => (
-                            <tr key={user.id}>
-                                <td>{user.id}</td>
-                                <td>{user.name}</td>
-                                <td>{user.username}</td>
-                                <td>{user.email}</td>
-                                <td>{user.password}</td>
-                                <td>
-                                    <Button type="button" className="btn btn-success mx-2" onClick={() => { setEditUserId(user.id); handleEditUser(); setupdateuser(user)}}>
-                                        Edit
-                                    </Button>
-                                    <Button variant="danger" onClick={() => { handleDeleteUser(); setuseridforDelete(user.id) }}>Delete</Button>
-                                </td>
-                            </tr>
-                        ))}
+                    {boards.map((board, index) => (
+                        <tr key={board.id}>
+                            <td>{board.id}</td>
+                            <td>{board.username}</td>
+                            <td>{board.title}</td>
+                            <td>{board.createdDate}</td>
+                            <td>{board.modifiedDate}</td>
+                            <td>
+                                <Button type="button" className="btn btn-success mx-2" onClick={() => { setEditUserId(user.id); handleEditUser(); setupdateuser(user)}}>
+                                    Edit
+                                </Button>
+                                <Button variant="danger" onClick={() => { handleDeleteUser(); setuseridforDelete(user.id) }}>Delete</Button>
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </Table>
             </div>
@@ -228,37 +229,23 @@ function User() {
             <div>
                 <Modal show={showModalAdduser} onHide={handleCloseModal}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Register User</Modal.Title>
+                        <Modal.Title>Register Board</Modal.Title>
                     </Modal.Header>
                     <form onSubmit={(e) => onSubmit(e)}>
                         <Modal.Body>
                             <div>
                                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                                    <Form.Label>Name</Form.Label>
+                                    <Form.Label>title</Form.Label>
                                     <Form.Control
-                                        name="name"
-                                        placeholder="Name"
+                                        name="title"
+                                        placeholder="title"
                                         onChange={(e) => onInputChange(e)}
                                         required
                                     />
-                                    <Form.Label>User Name</Form.Label>
+                                    <Form.Label>Content</Form.Label>
                                     <Form.Control
-                                        name="username"
-                                        placeholder="User Name"
-                                        onChange={(e) => onInputChange(e)}
-                                        required
-                                    />
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        name="email"
-                                        placeholder="name@example.com"
-                                        onChange={(e) => onInputChange(e)}
-                                        required
-                                    />
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        name="password"
-                                        placeholder="password"
+                                        name="content"
+                                        placeholder="Content"
                                         onChange={(e) => onInputChange(e)}
                                         required
                                     />
@@ -271,43 +258,6 @@ function User() {
                             </Button>
                             <Button type="submit" variant="primary">
                                 Save
-                            </Button>
-                        </Modal.Footer>
-
-                    </form>
-                </Modal>
-
-                <Modal show={showModalLoginuser} onHide={handleCloseModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Login User</Modal.Title>
-                    </Modal.Header>
-                    <form onSubmit={(e) => onLoginSubmit(e)}>
-                        <Modal.Body>
-                            <div>
-                                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                                    <Form.Label>Username</Form.Label>
-                                    <Form.Control
-                                        name="username"
-                                        placeholder="Username"
-                                        onChange={(e) => onLoginInputChange(e)}
-                                        required
-                                    />
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        name="password"
-                                        placeholder="Password"
-                                        onChange={(e) => onLoginInputChange(e)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleCloseModal}>
-                                Close
-                            </Button>
-                            <Button type="submit" variant="primary">
-                                Login
                             </Button>
                         </Modal.Footer>
 
@@ -367,12 +317,12 @@ function User() {
                 <Modal show={showModalDeleteuser} onHide={handleCloseModal} >
                     <Modal.Body className='bg-danger text-white'>
                         <p>Are you sure you want to delete this user?</p>
-                    <Button variant="primary" onClick={()=>{deleteUser();handleCloseModal()}} className='mx-2'>
-                        Yes
-                    </Button>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Close
-                    </Button>
+                        <Button variant="primary" onClick={()=>{deleteUser();handleCloseModal()}} className='mx-2'>
+                            Yes
+                        </Button>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            Close
+                        </Button>
                     </Modal.Body>
 
                 </Modal>
@@ -381,4 +331,4 @@ function User() {
     );
 }
 
-export default User;
+export default Board;

@@ -2,6 +2,7 @@ package com.example.springbackend.controller;
 
 import com.example.springbackend.DTO.BoardDto;
 import com.example.springbackend.Entity.Board;
+import com.example.springbackend.Service.BoardService;
 import com.example.springbackend.repo.BoardRepo;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -10,34 +11,39 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
-@Controller
+@RestController
 @CrossOrigin("http://localhost:3000")
 public class BoardController {
 
-    private final BoardRepo boardRepo;
+    private final BoardService boardService;
 
-    public BoardController(BoardRepo boardRepo) {
-        this.boardRepo = boardRepo;
+    public BoardController(BoardService boardService) {
+        this.boardService = boardService;
     }
 
     @PostMapping("/board/write")
-    public ResponseEntity<Object> writeBoard(@RequestParam("title") String title, @RequestParam("content") String content){
+    public ResponseEntity<Object> writeBoard(@RequestBody BoardDto boardDto){
 
-        System.out.println("/board/write/ title: " + title);
-        System.out.println("/board/write/ content: " + content);
-
+        System.out.println("/board/write PostMapping");
         Board board = new Board();
         board.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        board.setTitle(title);
-        board.setContent(content);
+        board.setTitle(board.getTitle());
+        board.setContent(boardDto.getContent());
         board.setCreatedDate(new Date());
         board.setModifiedDate(new Date());
 
-        boardRepo.save(board);
+        Board boardForReturn = boardService.post(board);
         // Creating HttpHeaders instance to add custom headers
         HttpHeaders headers = new HttpHeaders();
         headers.add("Custom-Header", "Value"); // Add custom header
-        return ResponseEntity.ok().headers(headers).body(board);
+        return ResponseEntity.ok().headers(headers).body(boardForReturn);
+    }
+
+    @GetMapping("/board")
+    List<Board> getAllBoards(){
+        System.out.println("/board getMapping");
+        return boardService.findAll();
     }
 }
