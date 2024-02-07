@@ -7,7 +7,6 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Alertmessage from '../component/Alertmessage';
 
-
 function User() {
 
     const [users, setUsers] = useState([]);
@@ -21,6 +20,7 @@ function User() {
     const [useridforDelete, setuseridforDelete] = useState();
     const [updateuser,setupdateuser]=useState([]);
     const [isLogined, setIsLogined] = useState(false);
+
 
     const [user, setUser] = useState({
         name: '',
@@ -104,6 +104,7 @@ function User() {
         handleCloseModal();
     };
 
+    // 로그인 & 토큰 저장
     const onLoginSubmit = async (e) => {
         e.preventDefault();
         const frm = new FormData();
@@ -134,7 +135,7 @@ function User() {
             // setmessage('User Logined');
             setalertColor("success")
 
-            let payload = token.substring(token.indexOf('.')+1,token.lastIndexOf('.'));
+            let payload = getToken.substring(getToken.indexOf('.')+1,getToken.lastIndexOf('.'));
             let dec = JSON.parse(atob(payload));
             setmessage(`${dec.username} 님 반갑습니다.`);
             setIsLogined(true);

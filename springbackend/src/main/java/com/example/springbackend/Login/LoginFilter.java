@@ -29,7 +29,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        System.out.println("attempAuthentication~~~");
         //클라이언트 요청에서 username, password 추출
         String username = obtainUsername(request);
         String password = obtainPassword(request);
@@ -66,6 +65,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         System.out.println("login fail");
-        response.setStatus(200);
+        response.setStatus(401);
     }
 }
