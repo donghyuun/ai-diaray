@@ -9,6 +9,20 @@ import Alertmessage from '../component/Alertmessage';
 
 function Board() {
 
+    const axiosInstance = axios.create();
+    axiosInstance.interceptors.request.use(
+        (config) => {
+            const token = localStorage.getItem("key")
+            if(token){
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
+        }
+    )
+
     const [boards, setBoards] = useState([]);
     const [showModalAdduser, setshowModalAdduser] = useState(false);
     const [showModalLoginuser, setshowModalLoginuser] = useState(false);
@@ -83,6 +97,8 @@ function Board() {
     };
 
     const onInputChange = (e) => {
+        console.log(e.target.name);
+        console.log(e.target.value);
         setPost({ ...post, [e.target.name]: e.target.value });
     };
 
@@ -97,7 +113,16 @@ function Board() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8080/board/write', post);
+        const token = localStorage.getItem("key");
+        // await axios.post('http://localhost:8080/board/write', post,{
+        //     headers:{
+        //         'Authorization': `Bearer ${token}`
+        //     }
+        // });
+        await axiosInstance.post("http://localhost:8080/board/write", post)
+            .then(response => {})
+            .catch(error => {})
+
         console.log('Post added');
         setmessage('New post Added');
         setalertColor("success")
@@ -212,6 +237,7 @@ function Board() {
                             <td>{board.id}</td>
                             <td>{board.username}</td>
                             <td>{board.title}</td>
+                            <td>{board.content}</td>
                             <td>{board.createdDate}</td>
                             <td>{board.modifiedDate}</td>
                             <td>

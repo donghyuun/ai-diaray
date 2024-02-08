@@ -29,12 +29,17 @@ public class BoardController {
         System.out.println("/board/write PostMapping");
         Board board = new Board();
         board.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        board.setTitle(board.getTitle());
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+        board.setTitle(boardDto.getTitle());
         board.setContent(boardDto.getContent());
         board.setCreatedDate(new Date());
         board.setModifiedDate(new Date());
 
         Board boardForReturn = boardService.post(board);
+        System.out.println(board.getTitle());
+        System.out.println(board.getContent());
+        System.out.println(boardForReturn.getTitle());
+        System.out.println(boardForReturn.getContent());
         // Creating HttpHeaders instance to add custom headers
         HttpHeaders headers = new HttpHeaders();
         headers.add("Custom-Header", "Value"); // Add custom header
