@@ -1,4 +1,4 @@
-package com.example.springbackend.controller;
+package com.example.springbackend.Controller;
 import com.example.springbackend.Exception.UserNotFoundException;
 import com.example.springbackend.Service.JoinService;
 import com.example.springbackend.Entity.User;
