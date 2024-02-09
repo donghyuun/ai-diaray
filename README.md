@@ -10,16 +10,16 @@
 - Frontend: React
 - Backend: Spring
 - Database: AWS S3
-- 
+  
 ## ✍️ 사용 기술
+- Frontend
+  - React
+  - Javascript
+  - React-Router
+    
 - Backend
   - Spring
   - Java
   - JWT + Cookie
   - AWS S3
-
-- Frontend
-  - React
-  - Javascript
-  - React-Router
 
