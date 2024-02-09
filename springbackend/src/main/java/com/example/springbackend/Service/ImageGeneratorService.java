@@ -1,5 +1,7 @@
 package com.example.springbackend.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -7,11 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 @Service
 public class ImageGeneratorService {
@@ -19,11 +18,15 @@ public class ImageGeneratorService {
     @Value("${kakao-app-key}")
     private String kakao_app_key;
     private final RestTemplate restTemplate;
-    public ImageGeneratorService(RestTemplate restTemplate) {
+    private final S3Service s3Service;
+    public ImageGeneratorService(RestTemplate restTemplate, S3Service s3Service) {
         this.restTemplate = restTemplate;
+        this.s3Service = s3Service;
     }
-    @ResponseBody
-    public void getAiImage(String content) throws Exception {
+
+    public String getAiImageUrl(String content) throws Exception {
+        String imgUrl = "";
+
         // Request 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
@@ -44,5 +47,20 @@ public class ImageGeneratorService {
 
         // Response Body 출력
         System.out.println("getAiImage(): " + response.getBody());
+        ObjectMapper mapper = new ObjectMapper();
+//        JsonNode jsonNode = mapper.readTree((JsonParser) response.getBody());
+        String resString = response.getBody().toString();
+
+        // images 배열에서 이미지 url 추출
+        JsonNode rootNode = mapper.readTree(resString);
+        JsonNode imagesNode = rootNode.get("images");
+        if (imagesNode.isArray() && imagesNode.size() > 0) {
+            JsonNode firstImageNode = imagesNode.get(0);
+            JsonNode imageUrlNode = firstImageNode.get("image");
+            if (imageUrlNode != null) {
+                imgUrl = imageUrlNode.asText();
+            }
+        }
+        return imgUrl;
     }
 }

@@ -4,6 +4,7 @@ import com.example.springbackend.DTO.BoardDto;
 import com.example.springbackend.Entity.Board;
 import com.example.springbackend.Service.BoardService;
 import com.example.springbackend.Service.ImageGeneratorService;
+import com.example.springbackend.Service.S3Service;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +19,12 @@ public class BoardController {
 
     private final BoardService boardService;
     private final ImageGeneratorService imageGeneratorService;
+    private final S3Service s3Service;
 
-    public BoardController(BoardService boardService, ImageGeneratorService imageGeneratorService) {
+    public BoardController(BoardService boardService, ImageGeneratorService imageGeneratorService, S3Service s3Service) {
         this.boardService = boardService;
         this.imageGeneratorService = imageGeneratorService;
+        this.s3Service = s3Service;
     }
 
     @PostMapping("/board/write")
@@ -48,7 +51,12 @@ public class BoardController {
         headers.add("Custom-Header", "Value"); // Add custom header
 
         //------------------//
-        imageGeneratorService.getAiImage(board.getContent());
+        //content 로부터 이미지 Url 추출
+        String imgUrl = imageGeneratorService.getAiImageUrl(board.getContent());
+        // 이미지 Url 을 이용해 s3 에 이미지 저장
+        String objUrl = s3Service.uploadImageFromUrlToS3(imgUrl);
+        headers.add("Access-Control-Expose-Headers", "Object-Url");
+        headers.add("Object-Url", objUrl);
         //------------------//
         return ResponseEntity.ok().headers(headers).body(boardForReturn);
     }

@@ -36,6 +36,7 @@ function Board() {
     const [isLogined, setIsLogined] = useState(false);
     const [post, setPost] = useState([]);
 
+    const [imgUrl, setImgUrl] = useState("");
 
     const [user, setUser] = useState({
         name: '',
@@ -114,13 +115,13 @@ function Board() {
     const onSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("key");
-        // await axios.post('http://localhost:8080/board/write', post,{
-        //     headers:{
-        //         'Authorization': `Bearer ${token}`
-        //     }
-        // });
         await axiosInstance.post("http://localhost:8080/board/write", post)
-            .then(response => {})
+            .then(response => {
+                setImgUrl(response.headers.get("Object-Url"));
+                console.log(response.headers.get("Object-Url"));
+                console.log(response);
+                }
+            )
             .catch(error => {})
 
         console.log('Post added');
@@ -194,6 +195,7 @@ function Board() {
 
     return (
         <div className=" mt-4">
+            {imgUrl != null && <img src={imgUrl} alt="aiImage"/>}
             <span>
                 <div className='d-flex'>
                 <Button variant="primary" onClick={handleAddUser}>
