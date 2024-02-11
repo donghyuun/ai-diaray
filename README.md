@@ -15,6 +15,7 @@
 - Frontend
   - React
   - Javascript
+  - Zustand
   - React-Router
     
 - Backend
