@@ -9,7 +9,7 @@
 - Intellij Ultimate (Java, javascript)
 - Frontend: React
 - Backend: Spring
-- Database: AWS S3
+- Database: AWS S3, MySQL
   
 ## ✍️ 사용 기술
 - Frontend
@@ -22,4 +22,5 @@
   - Java
   - JWT + Cookie
   - AWS S3
+  - MySQL
 
