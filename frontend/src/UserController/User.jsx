@@ -6,6 +6,7 @@ import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Alertmessage from '../component/Alertmessage';
+import useStore from "../store";
 
 function User() {
 
@@ -19,8 +20,10 @@ function User() {
     const [editUserID, setEditUserId] = useState();
     const [useridforDelete, setuseridforDelete] = useState();
     const [updateuser,setupdateuser]=useState([]);
-    const [isLogined, setIsLogined] = useState(false);
+    // const [isLogined, setIsLogined] = useState(false);
 
+    // zustand 를 이용한 전역 상태관리
+    const {isLogined, setIsLogined} = useStore(state => state);
 
     const [user, setUser] = useState({
         name: '',
@@ -189,6 +192,12 @@ function User() {
                         </Button>
                     )}
             </div>
+            <div className='d-flex'>
+                <Button href={"/board"} variant="primary">
+                    Board
+                </Button>
+            </div>
+
             <div className='mt-2'>
                 {/*<Alertmessage message={message} bg={alertColor} />*/}
             </div>
