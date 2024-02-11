@@ -22,5 +22,6 @@ public class Board {
     private String content; //내용
     private Date createdDate; //작성일
     private Date modifiedDate; //수정일
+    private String imgUrl; // ai 이미지 주소
 
 }

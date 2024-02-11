@@ -39,22 +39,26 @@ public class BoardController {
         board.setCreatedDate(new Date());
         board.setModifiedDate(new Date());
 
-
-
-        Board boardForReturn = boardService.post(board);
-        System.out.println(board.getTitle());
-        System.out.println(board.getContent());
-        System.out.println(boardForReturn.getTitle());
-        System.out.println(boardForReturn.getContent());
-        // Creating HttpHeaders instance to add custom headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Custom-Header", "Value"); // Add custom header
-
         //------------------//
         //content 로부터 이미지 Url 추출
         String imgUrl = imageGeneratorService.getAiImageUrl(board.getContent());
         // 이미지 Url 을 이용해 s3 에 이미지 저장
         String objUrl = s3Service.uploadImageFromUrlToS3(imgUrl);
+        // board 엔티티에 s3에 저장된 이미지 객체의 주소 저장
+        board.setImgUrl(objUrl);
+
+        Board boardForReturn = boardService.post(board);
+        System.out.println(board.getTitle());
+        System.out.println(board.getContent());
+        System.out.println(boardForReturn.getContent());
+        System.out.println(boardForReturn.getTitle());
+        System.out.println(boardForReturn.getImgUrl());
+
+        // Creating HttpHeaders instance to add custom headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Custom-Header", "Value"); // Add custom header
+
+
         headers.add("Access-Control-Expose-Headers", "Object-Url");
         headers.add("Object-Url", objUrl);
         //------------------//
