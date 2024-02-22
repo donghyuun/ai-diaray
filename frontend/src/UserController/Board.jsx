@@ -39,8 +39,9 @@ function Board() {
     // const [isLogined, setIsLogined] = useState(false);
     const [post, setPost] = useState([]);
 
-    // zustand 를 이용한 전역 상태관리
+    // zustand 를 이용한 전역 상태 사용&관리
     const {isLogined, setIsLogined} = useStore(state => state);
+    const {username, setUsername} = useStore(state => state);
 
 
     const [imgUrl, setImgUrl] = useState("");
@@ -83,6 +84,7 @@ function Board() {
     };
 
     const handleLogoutUser = () => {
+        setUsername("")
         setIsLogined(false);
         localStorage.removeItem("key");
         setmessage("로그아웃되었습니다.")
@@ -177,6 +179,7 @@ function Board() {
         handleCloseModal();
     };
 
+
     const onEditSubmit = async (e) => {
         console.log(editUserID);
         e.preventDefault();
@@ -262,6 +265,43 @@ function Board() {
     </div>
 
     <div>
+        <Modal show={showModalLoginuser} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+                <Modal.Title>Login User</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={(e) => onLoginSubmit(e)}>
+                <Modal.Body>
+                    <div>
+                        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                            <Form.Label>Username</Form.Label>
+                            <Form.Control
+                                name="username"
+                                placeholder="Username"
+                                onChange={(e) => onLoginInputChange(e)}
+                                required
+                            />
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                                name="password"
+                                placeholder="Password"
+                                onChange={(e) => onLoginInputChange(e)}
+                                required
+                            />
+                        </Form.Group>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button type="submit" variant="primary">
+                        Login
+                    </Button>
+                </Modal.Footer>
+
+            </form>
+        </Modal>
+
         <Modal show={showModalAdduser} onHide={handleCloseModal}>
             <Modal.Header closeButton>
                 <Modal.Title>Register Board</Modal.Title>
