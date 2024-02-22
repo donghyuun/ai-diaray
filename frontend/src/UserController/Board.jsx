@@ -8,6 +8,8 @@ import Form from 'react-bootstrap/Form';
 import Alertmessage from '../component/Alertmessage';
 import useStore from "../store";
 
+export default Board;
+
 function Board() {
 
     const axiosInstance = axios.create();
@@ -122,9 +124,9 @@ function Board() {
         const token = localStorage.getItem("key");
         await axiosInstance.post("http://localhost:8080/board/write", post)
             .then(response => {
-                setImgUrl(response.headers.get("Object-Url"));
-                console.log(response.headers.get("Object-Url"));
-                console.log(response);
+                    setImgUrl(response.headers.get("Object-Url"));
+                    console.log(response.headers.get("Object-Url"));
+                    console.log(response);
                 }
             )
             .catch(error => {})
@@ -200,8 +202,8 @@ function Board() {
 
     return (
         <div className=" mt-4">
-            {imgUrl != null && <img src={imgUrl} alt="aiImage"/>}
-            <span>
+            {imgUrl != "" ? <img src={imgUrl} alt="aiImage"/> : null}
+    <span>
                 <div className='d-flex'>
                 <Button variant="primary" onClick={handleAddUser}>
                     Add Post
@@ -226,142 +228,139 @@ function Board() {
                 {/*<Alertmessage message={message} bg={alertColor} />*/}
             </div>
             </span>
-            <div className="Usertable mt-4">
-                <Table className="shadow">
-                    <thead className="bg-warning text-white">
-                    <tr>
-                        <th>ID</th>
-                        <th>User name</th>
-                        <th>Title</th>
-                        <th>Content</th>
-                        <th>Created Date</th>
-                        <th>Modified Date</th>
-                    </tr>
-                    </thead>
-                    <tbody className="bg-light">
-                    {boards.map((board, index) => (
-                        <tr key={board.id}>
-                            <td>{board.id}</td>
-                            <td>{board.username}</td>
-                            <td>{board.title}</td>
-                            <td>{board.content}</td>
-                            <td>{board.createdDate}</td>
-                            <td>{board.modifiedDate}</td>
-                            <td>
-                                <Button type="button" className="btn btn-success mx-2" onClick={() => { setEditUserId(user.id); handleEditUser(); setupdateuser(user)}}>
-                                    Edit
-                                </Button>
-                                <Button variant="danger" onClick={() => { handleDeleteUser(); setuseridforDelete(user.id) }}>Delete</Button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </Table>
-            </div>
-
-            <div>
-                <Modal show={showModalAdduser} onHide={handleCloseModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Register Board</Modal.Title>
-                    </Modal.Header>
-                    <form onSubmit={(e) => onSubmit(e)}>
-                        <Modal.Body>
-                            <div>
-                                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                                    <Form.Label>title</Form.Label>
-                                    <Form.Control
-                                        name="title"
-                                        placeholder="title"
-                                        onChange={(e) => onInputChange(e)}
-                                        required
-                                    />
-                                    <Form.Label>Content</Form.Label>
-                                    <Form.Control
-                                        name="content"
-                                        placeholder="Content"
-                                        onChange={(e) => onInputChange(e)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleCloseModal}>
-                                Close
-                            </Button>
-                            <Button type="submit" variant="primary">
-                                Save
-                            </Button>
-                        </Modal.Footer>
-
-                    </form>
-                </Modal>
-            </div>
-
-
-            <div>
-                <Modal show={showModalEdituser} onHide={handleCloseModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Edit User</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <form onSubmit={(e) => onEditSubmit(e)}>
-                            <div>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Name</Form.Label>
-                                    <Form.Control
-                                        name="name"
-                                        placeholder="Name"
-                                        defaultValue={updateuser.name}
-                                        readOnly={false}
-                                        onChange={(e) => onInputChangeEdit(e)}
-                                        required
-                                    />
-                                    <Form.Label>User Name</Form.Label>
-                                    <Form.Control
-                                        name="username"
-                                        placeholder="User Name"
-                                        defaultValue={updateuser.username}
-                                        onChange={(e) => onInputChangeEdit(e)}
-                                        required
-                                    />
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        name="email"
-                                        defaultValue={updateuser.email}
-                                        placeholder="name@example.com"
-                                        onChange={(e) => onInputChangeEdit(e)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </div>
-                            <Button type="submit" variant="primary" className='mx-2'>
-                                Save
-                            </Button>
-                            <Button variant="secondary" onClick={handleCloseModal}>
-                                close
-                            </Button>
-                        </form>
-                    </Modal.Body>
-                </Modal>
-            </div>
-
-            <div>
-                <Modal show={showModalDeleteuser} onHide={handleCloseModal} >
-                    <Modal.Body className='bg-danger text-white'>
-                        <p>Are you sure you want to delete this user?</p>
-                        <Button variant="primary" onClick={()=>{deleteUser();handleCloseModal()}} className='mx-2'>
-                            Yes
+    <div className="Usertable mt-4">
+        <Table className="shadow">
+            <thead className="bg-warning text-white">
+            <tr>
+                <th>ID</th>
+                <th>User name</th>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Created Date</th>
+                <th>Modified Date</th>
+            </tr>
+            </thead>
+            <tbody className="bg-light">
+            {boards.map((board, index) => (
+                <tr key={board.id}>
+                    <td>{board.id}</td>
+                    <td>{board.username}</td>
+                    <td>{board.title}</td>
+                    <td><a href={`/board/${board.id}`}>{board.content}</a></td>
+                    <td>{board.createdDate}</td>
+                    <td>{board.modifiedDate}</td>
+                    <td>
+                        <Button type="button" className="btn btn-success mx-2" onClick={() => { setEditUserId(user.id); handleEditUser(); setupdateuser(user)}}>
+                            Edit
                         </Button>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Close
-                        </Button>
-                    </Modal.Body>
+                        <Button variant="danger" onClick={() => { handleDeleteUser(); setuseridforDelete(user.id) }}>Delete</Button>
+                    </td>
+                </tr>
+            ))}
+            </tbody>
+        </Table>
+    </div>
 
-                </Modal>
-            </div>
-        </div>
-    );
+    <div>
+        <Modal show={showModalAdduser} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+                <Modal.Title>Register Board</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={(e) => onSubmit(e)}>
+                <Modal.Body>
+                    <div>
+                        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                            <Form.Label>title</Form.Label>
+                            <Form.Control
+                                name="title"
+                                placeholder="title"
+                                onChange={(e) => onInputChange(e)}
+                                required
+                            />
+                            <Form.Label>Content</Form.Label>
+                            <Form.Control
+                                name="content"
+                                placeholder="Content"
+                                onChange={(e) => onInputChange(e)}
+                                required
+                            />
+                        </Form.Group>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button type="submit" variant="primary">
+                        Save
+                    </Button>
+                </Modal.Footer>
+
+            </form>
+        </Modal>
+    </div>
+
+    <div>
+        <Modal show={showModalEdituser} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+                <Modal.Title>Edit User</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <form onSubmit={(e) => onEditSubmit(e)}>
+                    <div>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                name="name"
+                                placeholder="Name"
+                                defaultValue={updateuser.name}
+                                readOnly={false}
+                                onChange={(e) => onInputChangeEdit(e)}
+                                required
+                            />
+                            <Form.Label>User Name</Form.Label>
+                            <Form.Control
+                                name="username"
+                                placeholder="User Name"
+                                defaultValue={updateuser.username}
+                                onChange={(e) => onInputChangeEdit(e)}
+                                required
+                            />
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control
+                                name="email"
+                                defaultValue={updateuser.email}
+                                placeholder="name@example.com"
+                                onChange={(e) => onInputChangeEdit(e)}
+                                required
+                            />
+                        </Form.Group>
+                    </div>
+                    <Button type="submit" variant="primary" className='mx-2'>
+                        Save
+                    </Button>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        close
+                    </Button>
+                </form>
+            </Modal.Body>
+        </Modal>
+    </div>
+
+    <div>
+        <Modal show={showModalDeleteuser} onHide={handleCloseModal} >
+            <Modal.Body className='bg-danger text-white'>
+                <p>Are you sure you want to delete this user?</p>
+                <Button variant="primary" onClick={()=>{deleteUser();handleCloseModal()}} className='mx-2'>
+                    Yes
+                </Button>
+                <Button variant="secondary" onClick={handleCloseModal}>
+                    Close
+                </Button>
+            </Modal.Body>
+
+        </Modal>
+    </div>
+</div>
+);
 }
-
-export default Board;

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin("http://localhost:3000")
@@ -69,5 +70,12 @@ public class BoardController {
     List<Board> getAllBoards(){
         System.out.println("/board getMapping");
         return boardService.findAll();
+    }
+
+    @GetMapping("/board/{id}")
+    public Board showContent(@PathVariable("id") int id){
+        Optional<Board> boardContent =  boardService.findById(id);
+        if(boardContent.isEmpty()) System.out.println("게시글의 내용을 db에서 찾을 수 없습니다.");
+        return boardContent.get();
     }
 }

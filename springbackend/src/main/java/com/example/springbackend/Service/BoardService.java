@@ -5,6 +5,7 @@ import com.example.springbackend.repo.BoardRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BoardService {
@@ -22,5 +23,9 @@ public class BoardService {
 
     public List<Board> findAll() {
         return boardRepo.findAll();
+    }
+
+    public Optional<Board> findById(int id) {
+        return boardRepo.findById(id);
     }
 }
