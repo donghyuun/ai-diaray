@@ -23,8 +23,9 @@ function User() {
     const [updateuser,setupdateuser]=useState([]);
     // const [isLogined, setIsLogined] = useState(false);
 
-    // zustand 를 이용한 전역 상태관리
+    // zustand 를 이용한 전역 상태 사용&관리
     const {isLogined, setIsLogined} = useStore(state => state);
+    const {username, setUsername} = useStore(state => state);
 
     const [user, setUser] = useState({
         name: '',
@@ -64,6 +65,7 @@ function User() {
     };
 
     const handleLogoutUser = () => {
+        setUsername("");
         setIsLogined(false);
         localStorage.removeItem("key");
         setmessage("로그아웃되었습니다.")
@@ -142,7 +144,9 @@ function User() {
             let payload = getToken.substring(getToken.indexOf('.')+1,getToken.lastIndexOf('.'));
             let dec = JSON.parse(atob(payload));
             setmessage(`${dec.username} 님 반갑습니다.`);
+            //전역 상태 관리
             setIsLogined(true);
+            setUsername(dec.username);
         }
         handleCloseModal();
     };

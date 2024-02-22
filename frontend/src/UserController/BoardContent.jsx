@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import {json, useNavigate, useParams} from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
+import useStore from "../store";
 
 export default BoardContent;
 
@@ -16,7 +17,7 @@ function BoardContent() {
     axiosInstance.interceptors.request.use(
         (config) => {
             const token = localStorage.getItem("key")
-            if(token){
+            if (token) {
                 config.headers['Authorization'] = `Bearer ${token}`;
             }
             return config;
@@ -26,11 +27,15 @@ function BoardContent() {
         }
     )
 
+    // zustand 를 이용한 전역 상태 사용&관리
+    const {isLogined, setIsLogined} = useStore(state => state);
+    const {username, setUsername} = useStore(state => state);
+
     const [boardContent, setBoardContent] = useState({});
     const [showModalEditBoardContent, setshowModalEditBoardContent] = useState(false);
     const [showModalDeleteBoardContent, setshowModalDeleteBoardContent] = useState(false);
     const navigate = useNavigate();
-    
+
 
     const handleEditBoardContent = () => {
         setshowModalEditBoardContent(true);
@@ -47,7 +52,7 @@ function BoardContent() {
     const onInputChange = (e) => {
         console.log(e.target.name);
         console.log(e.target.value);
-        setBoardContent({ ...boardContent, [e.target.name]: e.target.value });
+        setBoardContent({...boardContent, [e.target.name]: e.target.value});
     };
 
     const onEditSubmit = async (e) => {
@@ -70,7 +75,7 @@ function BoardContent() {
         // setalertColor('warning')
         console.log('Board Deleted');
         // getBoards(); // Fetch users again after adding a new user
-        
+
         //삭제 후 일기 게시판으로 이동
         navigate("/board");
     }
@@ -92,17 +97,23 @@ function BoardContent() {
             <div className="row">
                 <div className="col">
                     {boardContent?.imgUrl && (
-                        <img src={boardContent.imgUrl} alt="Board Image" />
+                        <img src={boardContent.imgUrl} alt="Board Image"/>
                     )}
                     <div>작성자: {boardContent?.username}</div>
                     <div>제목: {boardContent?.title}</div>
                     <div>내용: {boardContent?.content}</div>
                     <div>작성 날짜: {boardContent?.createdDate}</div>
                     <div>수정 날짜: {boardContent?.modifiedDate}</div>
-                    <Button type="button" className="btn btn-success mx-2" onClick={() => { handleEditBoardContent()}}>
-                        Edit
-                    </Button>
-                    <Button variant="danger" onClick={() => { handleDeleteBoardContent();}}>Delete</Button>
+                    {username != "" && isLogined == true ? (
+                        <div>
+                            <Button type="button" className="btn btn-success mx-2" onClick={() => {
+                                handleEditBoardContent()
+                            }}>
+                                Edit
+                            </Button>
+                            <Button variant="danger" onClick={() => {
+                                handleDeleteBoardContent();
+                            }}>Delete</Button>) </div>) : null}
                 </div>
             </div>
 
@@ -168,11 +179,15 @@ function BoardContent() {
                 </Modal>
             </div>
 
+
             <div>
-                <Modal show={showModalDeleteBoardContent} onHide={handleCloseModal} >
+                <Modal show={showModalDeleteBoardContent} onHide={handleCloseModal}>
                     <Modal.Body className='bg-danger text-white'>
                         <p>Are you sure you want to delete this board content?</p>
-                        <Button variant="primary" onClick={()=>{onDeleteSubmit();handleCloseModal()}} className='mx-2'>
+                        <Button variant="primary" onClick={() => {
+                            onDeleteSubmit();
+                            handleCloseModal()
+                        }} className='mx-2'>
                             Yes
                         </Button>
                         <Button variant="secondary" onClick={handleCloseModal}>
@@ -182,6 +197,7 @@ function BoardContent() {
 
                 </Modal>
             </div>
+
         </div>
     );
 }
