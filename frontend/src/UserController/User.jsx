@@ -7,6 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Alertmessage from '../component/Alertmessage';
 import useStore from "../store";
+import {redirect} from "react-router-dom";
 
 function User() {
 
@@ -166,6 +167,7 @@ function User() {
         setalertColor('warning')
         console.log('User Deleted');
         getUsers(); // Fetch users again after adding a new user
+
     }
 
 

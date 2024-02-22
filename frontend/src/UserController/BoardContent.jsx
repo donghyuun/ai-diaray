@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import {json, useParams} from "react-router-dom";
+import {json, useNavigate, useParams} from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
@@ -9,6 +9,8 @@ import Form from "react-bootstrap/Form";
 export default BoardContent;
 
 function BoardContent() {
+
+    const {id} = useParams();//id값 가져오기
 
     const axiosInstance = axios.create();
     axiosInstance.interceptors.request.use(
@@ -27,6 +29,8 @@ function BoardContent() {
     const [boardContent, setBoardContent] = useState({});
     const [showModalEditBoardContent, setshowModalEditBoardContent] = useState(false);
     const [showModalDeleteBoardContent, setshowModalDeleteBoardContent] = useState(false);
+    const navigate = useNavigate();
+    
 
     const handleEditBoardContent = () => {
         setshowModalEditBoardContent(true);
@@ -49,14 +53,8 @@ function BoardContent() {
     const onEditSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("key");
-        await axiosInstance.post(`http://localhost:8080/modify/board/${id}`, boardContent)
-            // .then(response => {
-            //         setImgUrl(response.headers.get("Object-Url"));
-            //         console.log(response.headers.get("Object-Url"));
-            //         console.log(response);
-            //     }
-            // )
-            // .catch(error => {})
+        const result = await axiosInstance.post(`http://localhost:8080/modify/board/${id}`, boardContent)
+        getBoardContent(id);
 
         console.log('Board modified');
         // setmessage('New post Added');
@@ -67,21 +65,23 @@ function BoardContent() {
 
     const onDeleteSubmit = async () => {
         console.log(id);
-        await axios.delete(`http://localhost:8080/delete/Board/${id}`);
+        await axios.delete(`http://localhost:8080/delete/board/${id}`);
         // setmessage('Board deleted');
         // setalertColor('warning')
         console.log('Board Deleted');
         // getBoards(); // Fetch users again after adding a new user
+        
+        //삭제 후 일기 게시판으로 이동
+        navigate("/board");
     }
 
-    //db에서 컨텐츠 가져오기
-    const {id} = useParams();//id값 가져오기
     const getBoardContent = async (id) => {
         const result = await axios.get(`http://localhost:8080/board/${id}`);
         setBoardContent(JSON.parse(JSON.stringify(result.data)));
         console.log("result.data: " + JSON.stringify(result.data));
     };
 
+    //db에서 컨텐츠 가져오기
     useEffect(() => {
         getBoardContent(id);
     }, []);
