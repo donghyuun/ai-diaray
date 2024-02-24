@@ -74,11 +74,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         User loginUser = userRepo.findByUsername(username);
         System.out.println(loginUser);
-        UserRefreshToken userRefreshToken = new UserRefreshToken(loginUser, refreshToken);
-        System.out.println(userRefreshToken);
+        
+        //기존에 해당 유저가 리프레시 토큰 가지고 있는 경우 -> 갱신
+        if(userRefreshTokenRepo.findByUserId(loginUser.getId()) != null){
+            userRefreshTokenRepo.findByUserId(loginUser.getId()).updateRefreshToken(refreshToken);
+            System.out.println("리프레시 토큰 갱신");
+        }
+        //리프레시 토큰이 없는 경우 -> db에 추가
+        else{
+            UserRefreshToken userRefreshToken = new UserRefreshToken(loginUser, refreshToken);
+            userRefreshTokenRepo.save(userRefreshToken);
+            System.out.println("리프레시 토큰 추가");
+        }
 
-        userRefreshTokenRepo.save(userRefreshToken);
-
+        
     }
 
     //로그인 실패시 실행하는 메소드
