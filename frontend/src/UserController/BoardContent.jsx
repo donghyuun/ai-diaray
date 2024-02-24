@@ -93,19 +93,19 @@ function BoardContent() {
 
 
     return (
-        <div className=" mt-4">
-            <div className="row">
+        <div className="mt-4 d-flex justify-content-center align-items-center">
+            <div className="">
                 <div className="col">
                     {boardContent?.imgUrl && (
-                        <img src={boardContent.imgUrl} alt="Board Image"/>
+                        <img src={boardContent.imgUrl} alt="Board Image" style={{ borderRadius: '10px' }} />
                     )}
                     <div>작성자: {boardContent?.username}</div>
                     <div>제목: {boardContent?.title}</div>
                     <div>내용: {boardContent?.content}</div>
                     <div>작성 날짜: {boardContent?.createdDate}</div>
                     <div>수정 날짜: {boardContent?.modifiedDate}</div>
-                    {username != "" && isLogined == true ? (
-                        <div>
+                    {username == boardContent.username && isLogined == true ? (
+                        <div className="mt-4 d-flex justify-content-center align-items-center">
                             <Button type="button" className="btn btn-success mx-2" onClick={() => {
                                 handleEditBoardContent()
                             }}>
@@ -113,7 +113,9 @@ function BoardContent() {
                             </Button>
                             <Button variant="danger" onClick={() => {
                                 handleDeleteBoardContent();
-                            }}>Delete</Button>) </div>) : null}
+                            }}>Delete</Button>
+                        </div>
+                    ) : null}
                 </div>
             </div>
 

@@ -1,6 +1,10 @@
 package com.example.springbackend.Login;
 
 import com.example.springbackend.DTO.CustomUserDetails;
+import com.example.springbackend.Entity.User;
+import com.example.springbackend.Entity.UserRefreshToken;
+import com.example.springbackend.repo.UserRefreshTokenRepo;
+import com.example.springbackend.repo.UserRepo;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,16 +18,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.Collection;
 import java.util.Iterator;
 
+
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final UserRefreshTokenRepo userRefreshTokenRepo;
     private final AuthenticationManager authenticationManager;
+    private final UserRepo userRepo;
 
     private final JWTUtil jwtUtil;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, UserRefreshTokenRepo userRefreshTokenRepo, UserRepo userRepo) {
 
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.userRefreshTokenRepo = userRefreshTokenRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -55,9 +64,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         String token = jwtUtil.createJwt(username, role, 60 * 60 * 100L);
+        String refreshToken = jwtUtil.createRefreshToken(600 * 600 * 100L);
+
         System.out.println("token: " + token);
         response.addHeader("Access-Control-Expose-Headers", "Authorization");
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader("Access-Control-Expose-Headers", "Refresh-Token");
+        response.addHeader("Authorization", "Bearer " + token);//토큰 발급
+        response.addHeader("Refresh-Token", "Bearer " + refreshToken);//리프레시 토큰 발급
+
+        User loginUser = userRepo.findByUsername(username);
+        System.out.println(loginUser);
+        UserRefreshToken userRefreshToken = new UserRefreshToken(loginUser, refreshToken);
+        System.out.println(userRefreshToken);
+
+        userRefreshTokenRepo.save(userRefreshToken);
 
     }
 

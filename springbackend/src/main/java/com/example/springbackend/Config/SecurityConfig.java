@@ -3,6 +3,8 @@ package com.example.springbackend.Config;
 import com.example.springbackend.Login.JWTFilter;
 import com.example.springbackend.Login.JWTUtil;
 import com.example.springbackend.Login.LoginFilter;
+import com.example.springbackend.repo.UserRefreshTokenRepo;
+import com.example.springbackend.repo.UserRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,9 +32,14 @@ public class SecurityConfig {
 
     private final JWTUtil jwtUtil;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil){
+    private final UserRepo userRepo;
+    private final UserRefreshTokenRepo userRefreshTokenRepo;
+
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, UserRepo userRepo, UserRefreshTokenRepo userRefreshTokenRepo){
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.userRefreshTokenRepo = userRefreshTokenRepo;
+        this.userRepo = userRepo;
     }
 
     @Bean
@@ -91,7 +98,7 @@ public class SecurityConfig {
         //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메서드에 authenticationConfiguration 객체를 넣어야 함)
         //따라서 등록 필요
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration) ,jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration) ,jwtUtil, userRefreshTokenRepo, userRepo), UsernamePasswordAuthenticationFilter.class);
 
         //세션 설정
         http
@@ -102,4 +109,5 @@ public class SecurityConfig {
         return http.build();
 
     }
+
 }
