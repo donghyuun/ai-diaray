@@ -55,6 +55,7 @@ function Board() {
                     console.log("get 요쳥 결과 수신, result 변수")
                     const newAccessToken = result.data;
                     console.log(newAccessToken);
+                    localStorage.setItem("key", newAccessToken);
 
                     config.headers['Authorization'] = `Bearer ${newAccessToken}`;
                     // //새로운 엑세스 토큰을 로컬 스토리지에 저장
