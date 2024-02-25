@@ -26,6 +26,8 @@ function User() {
     // zustand 를 이용한 전역 상태 사용&관리
     const {isLogined, setIsLogined} = useStore(state => state);
     const {username, setUsername} = useStore(state => state);
+    const {userId, setUserId} = useStore(state => state);
+    const {role, setRole} = useStore(state => state);
 
     const [user, setUser] = useState({
         name: '',
@@ -124,6 +126,7 @@ function User() {
         const response = await axios.post('http://localhost:8080/login', frm);
         // 헤더에서 토큰 추출
         let token = response.headers['authorization'];
+        let rfToken = response.headers['refresh-token'];
         // // 토큰을 localStorage에 set
 
         if(typeof token == "undefined" || token == null){
@@ -147,6 +150,19 @@ function User() {
             //전역 상태 관리
             setIsLogined(true);
             setUsername(dec.username);
+            setUserId(dec.id);
+            setRole(dec.role);
+        }
+
+        if(typeof rfToken == "undefined" || rfToken == null){
+            console.log('User Login Failed');
+            setmessage('User Login Failed');
+            setalertColor("error")
+        }else{
+            rfToken = rfToken.split(" ")[1];
+            localStorage.setItem("rfkey", rfToken);
+            const getRfToken = localStorage.getItem("rfkey");
+            console.log('rfToken:', getRfToken);
         }
         handleCloseModal();
     };

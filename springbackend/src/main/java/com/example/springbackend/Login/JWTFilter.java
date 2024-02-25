@@ -26,6 +26,15 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // 요청 URI 확인
+        String requestUri = request.getRequestURI();
+
+        // 특정 주소인 경우 필터를 건너뜀
+        if (requestUri.startsWith("/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         //request에서 Authorization 헤더를 찾음
         String authorization= request.getHeader("Authorization");
 
@@ -55,11 +64,13 @@ public class JWTFilter extends OncePerRequestFilter {
         //---------토큰 검증 후 값 추출---------//
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
+        Long userId = jwtUtil.getUserId(token);
 
         User userEntity = new User();
         userEntity.setUsername(username);
         userEntity.setPassword("temppassword");
         userEntity.setRole(role);
+        userEntity.setId(userId);
 
         //---------세션에 토큰에 담긴 유저 정보 저장---------//
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);

@@ -22,10 +22,12 @@ public class JWTUtil {
     }
 
     public String getUsername(String token) {
-
+        System.out.println("GetUsername 시작");
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
     }
-
+    public Long getUserId(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
+    }
     public String getRole(String   token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
@@ -37,11 +39,12 @@ public class JWTUtil {
     }
 
 
-    public String createJwt(String username, String role, Long expiredMs) {
+    public String createJwt(String username, String role, Long expiredMs, Long id) {
 
         return Jwts.builder()
                 .claim("username", username)
                 .claim("role", role)
+                .claim("id", id)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

@@ -9,10 +9,14 @@ const useStore = create(
             isLogined: false,
             setIsLogined: (value) => set({isLogined: value}),
             username: "",
-            setUsername: (value) => set({username: value})
+            setUsername: (value) => set({username: value}),
+            userId: -1,
+            setUserId: (value) => set({userId: value}),
+            role: "",
+            setRole: (value) => set({role: value})
         }),
         {
-            name: 'login state and username',
+            name: 'login state and username and userId',
         }
     )
 )

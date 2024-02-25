@@ -63,7 +63,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60 * 60 * 100L);
+        /**********token에 db의 userid넣어서 refreshtoken db에서 찾을때 쓰려고************/
+        User loginUser = userRepo.findByUsername(username);
+        System.out.println(loginUser);
+        /***************************************************************************/
+
+        String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L, loginUser.getId());
         String refreshToken = jwtUtil.createRefreshToken(600 * 600 * 100L);
 
         System.out.println("token: " + token);
@@ -72,8 +77,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.addHeader("Authorization", "Bearer " + token);//토큰 발급
         response.addHeader("Refresh-Token", "Bearer " + refreshToken);//리프레시 토큰 발급
 
-        User loginUser = userRepo.findByUsername(username);
-        System.out.println(loginUser);
+
         
         //기존에 해당 유저가 리프레시 토큰 가지고 있는 경우 -> 갱신
         if(userRefreshTokenRepo.findByUserId(loginUser.getId()) != null){
