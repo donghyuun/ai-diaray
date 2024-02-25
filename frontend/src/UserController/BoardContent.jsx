@@ -6,11 +6,12 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import useStore from "../store";
-
+// ES6
+import * as Vibrant from 'node-vibrant'
 //html to png 변환
 import * as htmlToImage from 'html-to-image';
 import axiosInstance from "../Axios/AxiosInstance";
-
+import {queries} from "@testing-library/react";
 export default BoardContent;
 
 function BoardContent() {
@@ -23,7 +24,7 @@ function BoardContent() {
     const {userId, setUserId} = useStore(state => state);
     const {role, setRole} = useStore(state => state);
 
-    const [boardContent, setBoardContent] = useState({});
+    const [boardContent, setBoardContent] = useState([]);
     const [showModalEditBoardContent, setshowModalEditBoardContent] = useState(false);
     const [showModalDeleteBoardContent, setshowModalDeleteBoardContent] = useState(false);
     const navigate = useNavigate();
@@ -74,18 +75,53 @@ function BoardContent() {
 
     const getBoardContent = async (id) => {
         const result = await axios.get(`http://localhost:8080/board/${id}`);
-        setBoardContent(JSON.parse(JSON.stringify(result.data)));
+        await setBoardContent(JSON.parse(JSON.stringify(result.data)));
         console.log("result.data: " + JSON.stringify(result.data));
     };
 
     //db에서 컨텐츠 가져오기
     useEffect(() => {
-        getBoardContent(id);
+        const fetchData = async ()=>{
+            await getBoardContent(id)
+        }
+        fetchData()
+
     }, []);
 
 
-    function htmlToImg() {
-        htmlToImage.toPng(document.getElementById('my-div'), { cacheBust: true })
+    //rgb 색상값을 HEX 값으로 변환
+    const [backgroundColorCode, setBackgroundColorCode] = useState("")
+    function ColorToHex(color) {
+        var hexadecimal = parseInt(color).toString(16);
+        console.log(hexadecimal);
+        return hexadecimal.length === 1 ? '0' + hexadecimal : hexadecimal;
+    }
+
+    async function ConvertRGBtoHex(red, green, blue) {
+        return '#' + ColorToHex(red) + ColorToHex(green) + ColorToHex(blue);
+    }
+
+    const containerStyle = {
+        backgroundImage: `linear-gradient(to bottom, ${backgroundColorCode}, white)`,
+        padding: "30px"
+    };
+
+    async function htmlToImg() {
+        const image = new Image();
+        image.crossOrigin = 'Anonymous'
+        image.src = imgUrl + "?not-from-cache-please"
+
+        const paletteData = await Vibrant.from(image).getPalette()
+        console.log(paletteData.DarkVibrant.rgb);
+        const rgbArray = paletteData.DarkVibrant.rgb
+
+        const hexColor = await ConvertRGBtoHex(rgbArray[0], rgbArray[1], rgbArray[2])
+        console.log(hexColor);
+        setBackgroundColorCode(hexColor)
+
+        htmlToImage.toPng(document.getElementById('download'), {
+            cacheBust: true, backgroundColor: hexColor
+        })
             .then(function (dataUrl) {
                 require("downloadjs")(dataUrl, 'my-node.png');
             });
@@ -97,15 +133,16 @@ function BoardContent() {
         <div className="mt-4 d-flex justify-content-center align-items-center">
             <div id='my-div' className="">
                 <div className="col">
+                    <div id="download" style={containerStyle}>
                     {boardContent?.imgUrl && (
                         <div><img src={imgUrl} alt="Board Image" style={{ borderRadius: '10px' }} /></div>
                     )}
                     <div>작성자: {boardContent?.username}</div>
                     <div>제목: {boardContent?.title}</div>
-                    <div>asdfasdf</div>
                     <div>내용: {boardContent?.content}</div>
-                    <div>작성 날짜: {boardContent?.createdDate}</div>
-                    <div>수정 날짜: {boardContent?.modifiedDate}</div>
+                    <div>작성 날짜: {new Date(boardContent.createdDate).toLocaleString('ko-KR')}</div>
+                    <div>수정 날짜: {new Date(boardContent.modifiedDate).toLocaleString('ko-KR')}</div>
+                    </div>
                     {username == boardContent.username && isLogined == true ? (
                         <div className="mt-4 d-flex justify-content-center align-items-center">
                             <Button type="button" className="btn btn-success mx-2" onClick={() => {
@@ -116,10 +153,10 @@ function BoardContent() {
                             <Button variant="danger" onClick={() => {
                                 handleDeleteBoardContent();
                             }}>Delete</Button>
+                            <Button type="submit" variant="primary" className='mx-2' onClick={htmlToImg}>이미지로 내려받기</Button>
                         </div>
                     ) : null}
                 </div>
-                <Button type="submit" variant="primary" className='mx-2' onClick={htmlToImg}>이미지로 내려받기</Button>
             </div>
 
             <div>
