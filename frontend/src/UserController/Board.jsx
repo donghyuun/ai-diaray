@@ -259,7 +259,7 @@ function Board() {
             <span>
                 <div className='d-flex'>
                 <Button variant="primary" onClick={handleAddUser}>
-                    Add Post
+                    게시글 작성
                 </Button>
             </div>
             <div className='mt-2'>
@@ -268,12 +268,12 @@ function Board() {
             <div className='d-flex'>
                 {isLogined ? (
                         <Button variant="primary" onClick={handleLogoutUser}>
-                            Logout
+                            로그아웃
                         </Button>
                     ) :
                     (
                         <Button variant="primary" onClick={handleLoginUser}>
-                            Login
+                            로그인
                         </Button>
                     )}
             </div>
@@ -285,12 +285,12 @@ function Board() {
                 <Table className="shadow">
                     <thead className="bg-warning text-white">
                     <tr>
-                        <th>ID</th>
-                        <th>User name</th>
-                        <th>Title</th>
-                        <th>Content</th>
-                        <th>Created Date</th>
-                        <th>Modified Date</th>
+                        <th>번호</th>
+                        <th>유저 이름</th>
+                        <th>제목</th>
+                        <th>내용</th>
+                        <th>작성일</th>
+                        <th>수정일</th>
                     </tr>
                     </thead>
                     <tbody className="bg-light">
@@ -300,8 +300,8 @@ function Board() {
                             <td>{board.username}</td>
                             <td>{board.title}</td>
                             <td><a href={`/board/${board.id}`}>{board.content}</a></td>
-                            <td>{board.createdDate}</td>
-                            <td>{board.modifiedDate}</td>
+                            <td>{new Date(board.createdDate).toLocaleString('ko-KR')}</td>
+                            <td>{new Date(board.modifiedDate).toLocaleString('ko-KR')}</td>
 
                             {/*<td>*/}
                             {/*    {username == board.username ? (*/}

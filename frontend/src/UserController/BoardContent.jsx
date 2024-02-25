@@ -7,18 +7,70 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import useStore from "../store";
 
+//html to png 변환
+import * as htmlToImage from 'html-to-image';
+
 export default BoardContent;
 
 function BoardContent() {
 
     const {id} = useParams();//id값 가져오기
 
+    // zustand 를 이용한 전역 상태 사용&관리
+    const {isLogined, setIsLogined} = useStore(state => state);
+    const {username, setUsername} = useStore(state => state);
+    const {userId, setUserId} = useStore(state => state);
+    const {role, setRole} = useStore(state => state);
+
     const axiosInstance = axios.create();
     axiosInstance.interceptors.request.use(
-        (config) => {
-            const token = localStorage.getItem("key")
+        async (config) => {
+            let token = localStorage.getItem("key")
             if (token) {
-                config.headers['Authorization'] = `Bearer ${token}`;
+                //*****************************************//
+                // JWT 토큰에서 만료 일자 추출
+                function extractExpiration(token) {
+                    const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+                    return new Date(tokenPayload.exp * 1000); // 만료 일자를 밀리초로 변환하여 반환
+                }
+
+                function isTokenExpired(token) {
+                    const expirationDate = extractExpiration(token);
+                    const currentDate = new Date();
+                    if(expirationDate < currentDate) console.log("엑세스 토큰의 유효기간이 만료되었습니다.")
+                    return expirationDate < currentDate; // 만료 일자와 현재 일자를 비교하여 토큰이 만료되었는지 확인
+                }
+
+                if (isTokenExpired(token)) {
+
+                    const refreshToken = localStorage.getItem("rfkey");
+
+                    console.log("get 요청, /refresh")
+                    const result = await axios.get("http://localhost:8080/refresh",
+                        { headers:
+                                {   "Authorization": `Bearer ${token}`,
+                                    "Refresh-Token": `Bearer ${refreshToken}`,
+                                    "User-Id":`${userId}`,
+                                    "User-Role": `${role}`,
+                                    "Username": `${username}`
+                                }
+                        });
+                    console.log("get 요쳥 결과 수신, result 변수")
+                    const newAccessToken = result.data;
+                    console.log(newAccessToken);
+                    localStorage.setItem("key", newAccessToken);
+
+                    config.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                    // //새로운 엑세스 토큰을 로컬 스토리지에 저장
+                    // localStorage.setItem("key", newAccessToken);
+                    // token = newAccessToken;
+
+                }
+                //******************************************//
+                else{
+                    //만료된게 아니라면 그냥 기존의 토큰을 헤더에 넣어서 요청을 보내면 됌
+                    config.headers['Authorization'] = `Bearer ${token}`;
+                }
             }
             return config;
         },
@@ -26,10 +78,6 @@ function BoardContent() {
             return Promise.reject(error);
         }
     )
-
-    // zustand 를 이용한 전역 상태 사용&관리
-    const {isLogined, setIsLogined} = useStore(state => state);
-    const {username, setUsername} = useStore(state => state);
 
     const [boardContent, setBoardContent] = useState({});
     const [showModalEditBoardContent, setshowModalEditBoardContent] = useState(false);
@@ -92,15 +140,25 @@ function BoardContent() {
     }, []);
 
 
+    function htmlToImg() {
+        htmlToImage.toPng(document.getElementById('my-div'), { cacheBust: true })
+            .then(function (dataUrl) {
+                require("downloadjs")(dataUrl, 'my-node.png');
+            });
+    }
+
+    let imgUrl = boardContent.imgUrl;
+    // imgUrl.setAttribute('src', `url/timestamp=${new Date().getTime()}`);
     return (
         <div className="mt-4 d-flex justify-content-center align-items-center">
-            <div className="">
+            <div id='my-div' className="">
                 <div className="col">
                     {boardContent?.imgUrl && (
-                        <img src={boardContent.imgUrl} alt="Board Image" style={{ borderRadius: '10px' }} />
+                        <div><img src={imgUrl} alt="Board Image" style={{ borderRadius: '10px' }} /></div>
                     )}
                     <div>작성자: {boardContent?.username}</div>
                     <div>제목: {boardContent?.title}</div>
+                    <div>asdfasdf</div>
                     <div>내용: {boardContent?.content}</div>
                     <div>작성 날짜: {boardContent?.createdDate}</div>
                     <div>수정 날짜: {boardContent?.modifiedDate}</div>
@@ -200,6 +258,7 @@ function BoardContent() {
                 </Modal>
             </div>
 
+            <button onClick={htmlToImg}>Convert</button>
         </div>
     );
 }

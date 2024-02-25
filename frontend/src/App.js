@@ -5,6 +5,7 @@ import NavigationBar from './component/NavigationBar';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Board from "./UserController/Board";
 import BoardContent from "./UserController/BoardContent";
+import HtmlToImg from "./UserController/HtmlToImg";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/" element={<User />}></Route>
                 <Route path="/board/:id" element={<BoardContent />}></Route>
                 <Route path="/board" element={<Board />}></Route>
+                <Route path="/htmlToImg" element={<HtmlToImg />}></Route>
                 {/* 상단에 위치하는 라우트들의 규칙을 모두 확인, 일치하는 라우트가 없는경우 처리 */}
             </Routes>
         </BrowserRouter>
