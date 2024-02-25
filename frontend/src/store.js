@@ -13,7 +13,7 @@ const useStore = create(
             userId: -1,
             setUserId: (value) => set({userId: value}),
             role: "",
-            setRole: (value) => set({role: value})
+            setRole: (value) => set({role: value}),
         }),
         {
             name: 'login state and username and userId',
