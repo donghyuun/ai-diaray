@@ -36,11 +36,14 @@ function BoardContent() {
     const [showModalEditComment, setshowModalEditComment] = useState({});
     const [showModalDeleteComment, setshowModalDeleteComment] = useState({});
 
+    // 댓글 리스트
     const [comments, setComments] = useState([]);
+    
+    // 전환용
     const navigate = useNavigate();
 
 
-    //**************게시글 수정, 삭제**************//
+    //**************게시글 수정, 삭제 모달창 "열기"**************//
     const handleEditBoardContent = () => {
         setshowModalEditBoardContent(true);
     };
@@ -50,7 +53,7 @@ function BoardContent() {
     //***********************************//
 
 
-    //**************댓글 수정, 삭제**************//
+    //**************댓글 수정, 삭제 모달창 "열기"**************//
     const handleEditComment = (commentId, commentContent) => {
         setshowModalEditComment({tf: true, commentId: commentId, commentContent: commentContent});
     };
@@ -58,6 +61,17 @@ function BoardContent() {
         setshowModalDeleteComment({tf: true, commentId: commentId});
     };
 
+    //**********댓글, 게시글 수정, 삭제 모달창 "닫기"**********//
+    const handleCloseModal = () => {
+        // 게시글 모달창
+        setshowModalEditBoardContent(false);
+        setshowModalDeleteBoardContent(false);
+        // 댓글 모달창
+        setshowModalEditComment(prevState => ({ ...prevState, tf: false }));
+        setshowModalDeleteComment(false);
+    };
+
+    //************** 댓글 수정, 삭제 제출 함수 **************//
     const onEditCommentSubmit = async (e) => {
         e.preventDefault();
         const data = {
@@ -68,31 +82,26 @@ function BoardContent() {
         console.log("댓글 수정 내용 data: " + data);
         const token = localStorage.getItem("key");
         const result = await axiosInstance(userId, role, username).post(`http://localhost:8080/modify/comment`, data)
-        console.log('댓글 수정 완료');
-        // setmessage('New post Added');
-        // setalertColor("success")
-        // getBoards(); // Fetch users again after adding a new user
+        console.log('댓글 수정 완료입니다.');
+
         handleCloseModal();
-        getComments(id);
     };
     //***********************************//
 
-    const handleCloseModal = () => {
-        setshowModalEditBoardContent(false);
-        setshowModalDeleteBoardContent(false);
-    };
-
+    //****************게시글 입력 함수*************//
     const onInputChange = (e) => {
         console.log(e.target.name);
         console.log(e.target.value);
         setBoardContent({...boardContent, [e.target.name]: e.target.value});
     };
 
+    //**************댓글 작성 함수****************//
     const [comment, setComment] = useState("")
     const onCommentInputChange = (e) => {
         setComment(e.target.value);
     };
 
+    //************ 게시글 수정 제출 함수**************//
     const onEditSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("key");
@@ -106,6 +115,7 @@ function BoardContent() {
         handleCloseModal();
     };
 
+    //************ 게시글 삭제 제출 함수**************//
     const onDeleteSubmit = async () => {
         console.log(id);
         await axios.delete(`http://localhost:8080/delete/board/${id}`);
@@ -118,18 +128,21 @@ function BoardContent() {
         navigate("/board");
     }
 
+    //********** 게시글 내용 불러오기 ***********//
     const getBoardContent = async (id) => {
         const result = await axios.get(`http://localhost:8080/board/${id}`);
         await setBoardContent(JSON.parse(JSON.stringify(result.data)));
         console.log("result.data: " + JSON.stringify(result.data));
     };
 
+    //********** 게시글 댓글들 불러오기 *********//
     const getComments = async (id) => {
         const result = await axios.get(`http://localhost:8080/comments/${id}`);
         await setComments(JSON.parse(JSON.stringify(result.data)));
         console.log("getComments result.data: " + JSON.stringify(result.data));
     }
-    //db에서 컨텐츠 가져오기
+
+    //********* db에서 컨텐츠 가져오기 *********//
     useEffect(() => {
         const fetchData = async () => {
             await getBoardContent(id);
@@ -182,12 +195,14 @@ function BoardContent() {
     let imgUrl = boardContent.imgUrl;
 
 
-    //***********댓글 수정*************//
+    //*********** 댓글 수정 입력 함수 *************//
     const [commentModiContent, setCommentModiContent] = useState("")
     const onCommentModiInputChange = (e) => {
         console.log(e.target.value);
         setCommentModiContent(e.target.value);
     };
+
+    //*********** 댓글 수정 제출 함수 ************//
     async function onCommentModiSubmit(e) {
         console.log()
         e.preventDefault();
@@ -200,12 +215,16 @@ function BoardContent() {
             console.log(data)
             const result = await axios.post('http://localhost:8080/modify/comment', data);
             console.log(result.data);
+            console.log("댓글 수정 완료입니다.")
+            handleCloseModal()
+            getComments(id)
         } catch (error) {
             console.error('Error submitting modified comment:', error);
         }
     }
-    //********************************//
 
+
+    //************* 댓글 작성 제출 함수 **********//
     async function onCommentSubmit(e) {
         console.log()
         e.preventDefault();
