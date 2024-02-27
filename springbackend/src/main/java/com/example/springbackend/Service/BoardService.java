@@ -28,10 +28,6 @@ public class BoardService {
         return boardRepo.findAll();
     }
 
-    public Optional<Board> findById(int id) {
-        return boardRepo.findById(id);
-    }
-
     public int deleteById(int id) {
         boardRepo.deleteById(id);
         return id;
@@ -50,4 +46,7 @@ public class BoardService {
         return board;
     }
 
+    public Optional<Board> findById(int id){
+        return boardRepo.findById(id);
+    }
 }

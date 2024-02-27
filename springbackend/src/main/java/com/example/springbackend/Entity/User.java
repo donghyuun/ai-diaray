@@ -3,6 +3,9 @@
 
     import jakarta.persistence.*;
 
+    import java.util.ArrayList;
+    import java.util.List;
+
     @Entity
     public class User {
 
@@ -17,6 +20,10 @@
 
         @OneToOne(mappedBy = "user")
         private UserRefreshToken userRefreshToken;
+
+        @OneToMany(mappedBy = "user")
+        private List<Comment> commentList = new ArrayList<>();
+
         public Long getId() {
             return id;
         }

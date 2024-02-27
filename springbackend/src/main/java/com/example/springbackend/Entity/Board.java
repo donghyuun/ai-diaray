@@ -1,13 +1,12 @@
 package com.example.springbackend.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,5 +22,8 @@ public class Board {
     private Date createdDate; //작성일
     private Date modifiedDate; //수정일
     private String imgUrl; // ai 이미지 주소
+
+//    @OneToMany(mappedBy = "board")
+//    private List<Comment> commentList = new ArrayList<>();
 
 }

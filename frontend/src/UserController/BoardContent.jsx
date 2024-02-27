@@ -12,6 +12,8 @@ import * as Vibrant from 'node-vibrant'
 import * as htmlToImage from 'html-to-image';
 import axiosInstance from "../Axios/AxiosInstance";
 import {queries} from "@testing-library/react";
+import board from "./Board";
+
 export default BoardContent;
 
 function BoardContent() {
@@ -24,18 +26,56 @@ function BoardContent() {
     const {userId, setUserId} = useStore(state => state);
     const {role, setRole} = useStore(state => state);
 
+
+    // useState 훅
     const [boardContent, setBoardContent] = useState([]);
+    //게시글 수정, 삭제
     const [showModalEditBoardContent, setshowModalEditBoardContent] = useState(false);
     const [showModalDeleteBoardContent, setshowModalDeleteBoardContent] = useState(false);
+    //댓글 수정, 삭제
+    const [showModalEditComment, setshowModalEditComment] = useState({});
+    const [showModalDeleteComment, setshowModalDeleteComment] = useState({});
+
+    const [comments, setComments] = useState([]);
     const navigate = useNavigate();
 
 
+    //**************게시글 수정, 삭제**************//
     const handleEditBoardContent = () => {
         setshowModalEditBoardContent(true);
     };
     const handleDeleteBoardContent = () => {
         setshowModalDeleteBoardContent(true);
     };
+    //***********************************//
+
+
+    //**************댓글 수정, 삭제**************//
+    const handleEditComment = (commentId, commentContent) => {
+        setshowModalEditComment({tf: true, commentId: commentId, commentContent: commentContent});
+    };
+    const handleDeleteComment = (commentId) => {
+        setshowModalDeleteComment({tf: true, commentId: commentId});
+    };
+
+    const onEditCommentSubmit = async (e) => {
+        e.preventDefault();
+        const data = {
+            boardId: boardContent.id,
+            commentId: showModalEditComment.commentId,
+            content: commentModiContent
+        }
+        console.log("댓글 수정 내용 data: " + data);
+        const token = localStorage.getItem("key");
+        const result = await axiosInstance(userId, role, username).post(`http://localhost:8080/modify/comment`, data)
+        console.log('댓글 수정 완료');
+        // setmessage('New post Added');
+        // setalertColor("success")
+        // getBoards(); // Fetch users again after adding a new user
+        handleCloseModal();
+        getComments(id);
+    };
+    //***********************************//
 
     const handleCloseModal = () => {
         setshowModalEditBoardContent(false);
@@ -46,6 +86,11 @@ function BoardContent() {
         console.log(e.target.name);
         console.log(e.target.value);
         setBoardContent({...boardContent, [e.target.name]: e.target.value});
+    };
+
+    const [comment, setComment] = useState("")
+    const onCommentInputChange = (e) => {
+        setComment(e.target.value);
     };
 
     const onEditSubmit = async (e) => {
@@ -79,10 +124,16 @@ function BoardContent() {
         console.log("result.data: " + JSON.stringify(result.data));
     };
 
+    const getComments = async (id) => {
+        const result = await axios.get(`http://localhost:8080/comments/${id}`);
+        await setComments(JSON.parse(JSON.stringify(result.data)));
+        console.log("getComments result.data: " + JSON.stringify(result.data));
+    }
     //db에서 컨텐츠 가져오기
     useEffect(() => {
-        const fetchData = async ()=>{
-            await getBoardContent(id)
+        const fetchData = async () => {
+            await getBoardContent(id);
+            await getComments(id);
         }
         fetchData()
 
@@ -91,6 +142,7 @@ function BoardContent() {
 
     //rgb 색상값을 HEX 값으로 변환
     const [backgroundColorCode, setBackgroundColorCode] = useState("")
+
     function ColorToHex(color) {
         var hexadecimal = parseInt(color).toString(16);
         console.log(hexadecimal);
@@ -128,20 +180,102 @@ function BoardContent() {
     }
 
     let imgUrl = boardContent.imgUrl;
+
+
+    //***********댓글 수정*************//
+    const [commentModiContent, setCommentModiContent] = useState("")
+    const onCommentModiInputChange = (e) => {
+        console.log(e.target.value);
+        setCommentModiContent(e.target.value);
+    };
+    async function onCommentModiSubmit(e) {
+        console.log()
+        e.preventDefault();
+        const data = {
+            boardId: boardContent.id,
+            commentId: showModalEditComment.commentId,
+            content: commentModiContent
+        }
+        try {
+            console.log(data)
+            const result = await axios.post('http://localhost:8080/modify/comment', data);
+            console.log(result.data);
+        } catch (error) {
+            console.error('Error submitting modified comment:', error);
+        }
+    }
+    //********************************//
+
+    async function onCommentSubmit(e) {
+        console.log()
+        e.preventDefault();
+        const data = {
+            boardId: parseInt(id),
+            username: username,
+            userId: parseInt(userId),
+            content: comment
+        }
+        try {
+            console.log(data)
+            const result = await axios.post('http://localhost:8080/write/comment', data);
+            console.log(result.data);
+        } catch (error) {
+            console.error('Error submitting comment:', error);
+        }
+    }
+
     // imgUrl.setAttribute('src', `url/timestamp=${new Date().getTime()}`);
     return (
         <div className="mt-4 d-flex justify-content-center align-items-center">
             <div id='my-div' className="">
                 <div className="col">
                     <div id="download" style={containerStyle}>
-                    {boardContent?.imgUrl && (
-                        <div><img src={imgUrl} alt="Board Image" style={{ borderRadius: '10px' }} /></div>
-                    )}
-                    <div>작성자: {boardContent?.username}</div>
-                    <div>제목: {boardContent?.title}</div>
-                    <div>내용: {boardContent?.content}</div>
-                    <div>작성 날짜: {new Date(boardContent.createdDate).toLocaleString('ko-KR')}</div>
-                    <div>수정 날짜: {new Date(boardContent.modifiedDate).toLocaleString('ko-KR')}</div>
+                        {boardContent?.imgUrl && (
+                            <div><img src={imgUrl} alt="Board Image" style={{borderRadius: '10px'}}/></div>
+                        )}
+                        <div>작성자: {boardContent?.username}</div>
+                        <div>제목: {boardContent?.title}</div>
+                        <div>내용: {boardContent?.content}</div>
+                        <div>작성 날짜: {new Date(boardContent.createdDate).toLocaleString('ko-KR')}</div>
+                        <div>수정 날짜: {new Date(boardContent.modifiedDate).toLocaleString('ko-KR')}</div>
+                        <div id="comments">
+                            {comments.map((comment, index) => (
+                                <div key={index}>
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            {comment.username}: {comment.content}
+                                        </div>
+                                        {username === comment.username && isLogined === true && (
+                                            <span className="mt-4 d-flex justify-content-center align-items-center">
+                    <Button type="button" className="btn btn-success mx-2" onClick={() => {
+                        handleEditComment(comment.id, comment.content)
+                    }}>
+                        Edit
+                    </Button>
+                    <Button variant="danger" onClick={() => {
+                        handleDeleteComment(comment.id);
+                    }}>Delete</Button>
+                </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                        </div>
+                    </div>
+
+                    <div id="commentArea">
+                        <form id="commentForm" onSubmit={onCommentSubmit}>
+                            <div className="mb-3">
+                                {/*<div>{boardContent?.username}</div>*/}
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="commentContent" className="form-label">댓글 내용</label>
+                                <textarea className="form-control" id="commentContent" name="commentContent" rows="3"
+                                          required onChange={(e) => onCommentInputChange(e)}></textarea>
+                            </div>
+                            <button type="submit" className="btn btn-primary">댓글 작성</button>
+                        </form>
                     </div>
                     {username == boardContent.username && isLogined == true ? (
                         <div className="mt-4 d-flex justify-content-center align-items-center">
@@ -153,7 +287,8 @@ function BoardContent() {
                             <Button variant="danger" onClick={() => {
                                 handleDeleteBoardContent();
                             }}>Delete</Button>
-                            <Button type="submit" variant="primary" className='mx-2' onClick={htmlToImg}>이미지로 내려받기</Button>
+                            <Button type="submit" variant="primary" className='mx-2' onClick={htmlToImg}>이미지로
+                                내려받기</Button>
                         </div>
                     ) : null}
                 </div>
@@ -240,6 +375,55 @@ function BoardContent() {
                 </Modal>
             </div>
 
+            {/*댓글 수정, 삭제*/}
+            <div>
+                <Modal show={showModalEditComment.tf} onHide={handleCloseModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>댓글 수정</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form onSubmit={(e) => onCommentModiSubmit(e)}>
+                            <div>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>내용</Form.Label>
+                                    <Form.Control
+                                        name="content"
+                                        placeholder="content"
+                                        defaultValue={showModalEditComment.commentContent}
+                                        onChange={(e) => onCommentModiInputChange(e)}
+                                        required
+                                    />
+                                </Form.Group>
+                            </div>
+                            <Button type="submit" variant="primary" className='mx-2'>
+                                Save
+                            </Button>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                                close
+                            </Button>
+                        </form>
+                    </Modal.Body>
+                </Modal>
+            </div>
+
+
+            <div>
+                <Modal show={showModalDeleteComment.tf} onHide={handleCloseModal}>
+                    <Modal.Body className='bg-danger text-white'>
+                        <p>댓글을 삭제하시겠습니까?</p>
+                        <Button variant="primary" onClick={() => {
+                            onDeleteSubmit();
+                            handleCloseModal()
+                        }} className='mx-2'>
+                            Yes
+                        </Button>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            Close
+                        </Button>
+                    </Modal.Body>
+
+                </Modal>
+            </div>
         </div>
     );
 }

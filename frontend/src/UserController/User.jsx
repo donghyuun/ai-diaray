@@ -70,6 +70,8 @@ function User() {
         setUsername("");
         setIsLogined(false);
         localStorage.removeItem("key");
+        localStorage.removeItem("rfkey");
+        setUserId("")
         setmessage("로그아웃되었습니다.")
         setalertColor("success");
     };

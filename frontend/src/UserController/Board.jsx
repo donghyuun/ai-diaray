@@ -78,6 +78,8 @@ function Board() {
         setUsername("")
         setIsLogined(false);
         localStorage.removeItem("key");
+        localStorage.removeItem("rfkey");
+        setUserId("");
         setmessage("로그아웃되었습니다.")
         setalertColor("success");
     };
@@ -166,8 +168,12 @@ function Board() {
             let payload = getToken.substring(getToken.indexOf('.') + 1, getToken.lastIndexOf('.'));
             let dec = JSON.parse(atob(payload));
             setmessage(`${dec.username} 님 반갑습니다.`);
-            setUsername(dec.username);
+
+            //전역 상태 관리
             setIsLogined(true);
+            setUsername(dec.username);
+            setUserId(dec.id);
+            setRole(dec.role);
         }
         handleCloseModal();
     };
