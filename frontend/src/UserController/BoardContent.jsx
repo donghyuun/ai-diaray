@@ -36,9 +36,12 @@ function BoardContent() {
     const [showModalEditComment, setshowModalEditComment] = useState({});
     const [showModalDeleteComment, setshowModalDeleteComment] = useState({});
 
+    // 댓글 작성
+    const [comment, setComment] = useState("")
+
     // 댓글 리스트
     const [comments, setComments] = useState([]);
-    
+
     // 전환용
     const navigate = useNavigate();
 
@@ -96,7 +99,6 @@ function BoardContent() {
     };
 
     //**************댓글 작성 함수****************//
-    const [comment, setComment] = useState("")
     const onCommentInputChange = (e) => {
         setComment(e.target.value);
     };
@@ -238,6 +240,8 @@ function BoardContent() {
             console.log(data)
             const result = await axios.post('http://localhost:8080/write/comment', data);
             console.log(result.data);
+            setComment("");
+            getComments(id);
         } catch (error) {
             console.error('Error submitting comment:', error);
         }
@@ -257,31 +261,31 @@ function BoardContent() {
                         <div>내용: {boardContent?.content}</div>
                         <div>작성 날짜: {new Date(boardContent.createdDate).toLocaleString('ko-KR')}</div>
                         <div>수정 날짜: {new Date(boardContent.modifiedDate).toLocaleString('ko-KR')}</div>
-                        <div id="comments">
+                        <div style={{ maxHeight: '130px', overflowY: 'auto' }}>
                             {comments.map((comment, index) => (
                                 <div key={index}>
-                                    <div className="d-flex justify-content-between align-items-center">
+                                    <div className="d-flex justify-content-between align-items-center" style={{ margin: '3px' }}>
                                         <div>
                                             {comment.username}: {comment.content}
                                         </div>
                                         {username === comment.username && isLogined === true && (
-                                            <span className="mt-4 d-flex justify-content-center align-items-center">
-                    <Button type="button" className="btn btn-success mx-2" onClick={() => {
-                        handleEditComment(comment.id, comment.content)
-                    }}>
-                        Edit
-                    </Button>
-                    <Button variant="danger" onClick={() => {
-                        handleDeleteComment(comment.id);
-                    }}>Delete</Button>
-                </span>
+                                            <div className="d-flex justify-content-center align-items-center">
+                                                <Button type="button" className="d-flex align-items-center btn btn-success mx-2 btn-sm" onClick={() => {
+                                                    handleEditComment(comment.id, comment.content)
+                                                }}>
+                                                    Edit
+                                                </Button>
+                                                <Button variant="danger" className="btn btn-success mx-2 btn-sm" onClick={() => {
+                                                    handleDeleteComment(comment.id);
+                                                }}>Delete</Button>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
                             ))}
-
-                        </div>
                     </div>
+
+                </div>
 
                     <div id="commentArea">
                         <form id="commentForm" onSubmit={onCommentSubmit}>
@@ -290,7 +294,7 @@ function BoardContent() {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="commentContent" className="form-label">댓글 내용</label>
-                                <textarea className="form-control" id="commentContent" name="commentContent" rows="3"
+                                <textarea className="form-control" id="commentContent" name="commentContent" rows="3" value={comment}
                                           required onChange={(e) => onCommentInputChange(e)}></textarea>
                             </div>
                             <button type="submit" className="btn btn-primary">댓글 작성</button>
