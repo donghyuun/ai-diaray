@@ -42,11 +42,9 @@ function User() {
         password: ''
     });
 
-    const [edituser, seteditUser] = useState({
-        Ename: '',
-        Eusername: '',
-        Epassword: '',
-        Eemail: '',
+    const [editUser, setEditUser] = useState({
+        name: '',
+        username: '',
     });
 
     useEffect(() => {
@@ -100,7 +98,7 @@ function User() {
     };
 
     const onInputChangeEdit = (e) => {
-        seteditUser({ ...edituser, [e.target.name]: e.target.value });
+        setEditUser({ ...editUser, [e.target.name]: e.target.value });
     };
 
 
@@ -172,11 +170,11 @@ function User() {
     const onEditSubmit = async (e) => {
         console.log(editUserID);
         e.preventDefault();
-        await axios.put(`http://localhost:8080/updateUser/${editUserID}`, edituser);
+        await axios.put(`http://localhost:8080/updateUser/${editUserID}`, editUser);
         console.log('User Updated');
         setmessage('User update success');
         setalertColor('info')
-        console.log(edituser);
+        console.log(editUser);
         getUsers(); // Fetch users again after adding a new user
         handleCloseModal();
     };

@@ -36,6 +36,8 @@ public class ImageGeneratorService {
         JSONObject requestBody = new JSONObject();
         requestBody.put("prompt", "Draw an oil painting with texture: " + content);
         requestBody.put("negative_prompt", "ugly face, cropped, scary, sordid, text");
+        requestBody.put("width", "640");
+        requestBody.put("height", "640");
         String serializedRequestBody = requestBody.toString(); //생성한 객체를 직렬화함
         // Request Entity 설정
         HttpEntity entity = new HttpEntity(serializedRequestBody, headers);

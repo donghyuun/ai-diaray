@@ -5,10 +5,7 @@ import com.example.springbackend.DTO.CommentModiDto;
 import com.example.springbackend.Entity.Board;
 import com.example.springbackend.Entity.Comment;
 import com.example.springbackend.Entity.User;
-import com.example.springbackend.Key.CommentId;
-import com.example.springbackend.repo.BoardRepo;
 import com.example.springbackend.repo.CommentRepo;
-import com.example.springbackend.repo.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -39,8 +36,8 @@ public class CommentService {
         comment.setModifiedDate(new Date());
         comment.setBoard(board);
 
-        comment.setBoard(board);
         comment.setUser(user.get());
+        System.out.println(comment);
         commentRepo.save(comment);
         return comment;
     }
@@ -50,13 +47,16 @@ public class CommentService {
     }
 
     public Comment modify(CommentModiDto commentModiDto) {
-        CommentId commentId = new CommentId(commentModiDto.getBoardId(), commentModiDto.getCommentId());
-        Comment comment = commentRepo.findById(commentId).get();
+        Comment comment = commentRepo.findById(commentModiDto.getCommentId()).get();
 
         comment.setContent(commentModiDto.getContent());
         comment.setModifiedDate(new Date());
         commentRepo.save(comment);
         System.out.println("댓글 수정 완료");
         return comment;
+    }
+
+    public void delete(long commentId){
+        commentRepo.deleteById(commentId);
     }
 }

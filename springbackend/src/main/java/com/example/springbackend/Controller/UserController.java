@@ -42,9 +42,9 @@ public class UserController {
         return userRepository.findById(id)
                 .map(user ->{
                     user.setUsername(newUser.getUsername());
-                    user.setEmail(newUser.getEmail());
+                    user.setEmail(user.getEmail());
                     user.setName(newUser.getName());
-                    user.setPassword(newUser.getPassword());
+                    user.setPassword(user.getPassword());
                     user.setRole("ROLE_USER");
                     return userRepository.save(user);
                 }).orElseThrow(()->new UserNotFoundException(id));

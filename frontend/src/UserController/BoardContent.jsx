@@ -70,7 +70,7 @@ function BoardContent() {
         setshowModalEditBoardContent(false);
         setshowModalDeleteBoardContent(false);
         // 댓글 모달창
-        setshowModalEditComment(prevState => ({ ...prevState, tf: false }));
+        setshowModalEditComment(prevState => ({...prevState, tf: false}));
         setshowModalDeleteComment(false);
     };
 
@@ -78,7 +78,7 @@ function BoardContent() {
     const onEditCommentSubmit = async (e) => {
         e.preventDefault();
         const data = {
-            boardId: boardContent.id,
+            boardId: boardContent.id, // 필요없음
             commentId: showModalEditComment.commentId,
             content: commentModiContent
         }
@@ -89,6 +89,15 @@ function BoardContent() {
 
         handleCloseModal();
     };
+
+    const onDeleteCommentSubmit = async (commentId) => {
+        console.log(id);
+        await axios.delete(`http://localhost:8080/delete/comment/${commentId}`);
+        console.log('Board Deleted');
+
+        //댓글 다시 불러오기
+        getComments(id);
+    }
     //***********************************//
 
     //****************게시글 입력 함수*************//
@@ -102,6 +111,7 @@ function BoardContent() {
     const onCommentInputChange = (e) => {
         setComment(e.target.value);
     };
+
 
     //************ 게시글 수정 제출 함수**************//
     const onEditSubmit = async (e) => {
@@ -139,9 +149,9 @@ function BoardContent() {
 
     //********** 게시글 댓글들 불러오기 *********//
     const getComments = async (id) => {
-        const result = await axios.get(`http://localhost:8080/comments/${id}`);
+        const result = await axios.get(`http://localhost:8080/comments/${id}`); //게시글 id로 가져옴
         await setComments(JSON.parse(JSON.stringify(result.data)));
-        console.log("getComments result.data: " + JSON.stringify(result.data));
+        console.log("getComments result.data: " + JSON.stringify(result.data, null, 2));
     }
 
     //********* db에서 컨텐츠 가져오기 *********//
@@ -170,7 +180,8 @@ function BoardContent() {
 
     const containerStyle = {
         backgroundImage: `linear-gradient(to bottom, ${backgroundColorCode}, white)`,
-        padding: "30px"
+        padding: "30px",
+        display: "flex"
     };
 
     async function htmlToImg() {
@@ -249,71 +260,79 @@ function BoardContent() {
 
     // imgUrl.setAttribute('src', `url/timestamp=${new Date().getTime()}`);
     return (
-        <div className="mt-4 d-flex justify-content-center align-items-center">
+        <div className="mt-4 justify-content-center align-items-center">
             <div id='my-div' className="">
                 <div className="col">
                     <div id="download" style={containerStyle}>
                         {boardContent?.imgUrl && (
-                            <div><img src={imgUrl} alt="Board Image" style={{borderRadius: '10px'}}/></div>
+                            <div style={{flex: '1', marginRight: '10px'}}>
+                                <div><img src={imgUrl} alt="Board Image" style={{borderRadius: '10px'}}/></div>
+                            </div>
                         )}
-                        <div>작성자: {boardContent?.username}</div>
-                        <div>제목: {boardContent?.title}</div>
-                        <div>내용: {boardContent?.content}</div>
-                        <div>작성 날짜: {new Date(boardContent.createdDate).toLocaleString('ko-KR')}</div>
-                        <div>수정 날짜: {new Date(boardContent.modifiedDate).toLocaleString('ko-KR')}</div>
-                        <div style={{ maxHeight: '130px', overflowY: 'auto' }}>
-                            {comments.map((comment, index) => (
-                                <div key={index}>
-                                    <div className="d-flex justify-content-between align-items-center" style={{ margin: '3px' }}>
-                                        <div>
-                                            {comment.username}: {comment.content}
-                                        </div>
-                                        {username === comment.username && isLogined === true && (
-                                            <div className="d-flex justify-content-center align-items-center">
-                                                <Button type="button" className="d-flex align-items-center btn btn-success mx-2 btn-sm" onClick={() => {
-                                                    handleEditComment(comment.id, comment.content)
-                                                }}>
-                                                    Edit
-                                                </Button>
-                                                <Button variant="danger" className="btn btn-success mx-2 btn-sm" onClick={() => {
-                                                    handleDeleteComment(comment.id);
-                                                }}>Delete</Button>
+                        <div style={{flex: '1', overflow: 'hidden'}}>
+                            <div>작성자: {boardContent?.username}</div>
+                            <div>제목: {boardContent?.title}</div>
+                            <div>내용: {boardContent?.content}</div>
+                            <div>작성 날짜: {new Date(boardContent.createdDate).toLocaleString('ko-KR')}</div>
+                            <div>수정 날짜: {new Date(boardContent.modifiedDate).toLocaleString('ko-KR')}</div>
+                            <div style={{maxHeight: '130px', overflowY: 'auto'}}>
+                                {comments.map((comment, index) => (
+                                    <div key={index}>
+                                        <div className="d-flex justify-content-between align-items-center"
+                                             style={{margin: '3px'}}>
+                                            <div>
+                                                {comment.username}: {comment.content}
                                             </div>
-                                        )}
+                                            {username === comment.username && isLogined === true && (
+                                                <div className="d-flex justify-content-center align-items-center">
+                                                    <Button type="button"
+                                                            className="d-flex align-items-center btn btn-success mx-2 btn-sm"
+                                                            onClick={() => {
+                                                                handleEditComment(comment.id, comment.content)
+                                                            }}>
+                                                        Edit
+                                                    </Button>
+                                                    <Button variant="danger" className="btn btn-success mx-2 btn-sm"
+                                                            onClick={() => {
+                                                                handleDeleteComment(comment.id);
+                                                            }}>Delete</Button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
+                                ))}
+                            </div>
+
+                            {username == boardContent.username && isLogined == true ? (
+                                <div className="mt-4 d-flex justify-content-center align-items-center">
+                                    <Button type="button" className="btn btn-success mx-2" onClick={() => {
+                                        handleEditBoardContent()
+                                    }}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="danger" onClick={() => {
+                                        handleDeleteBoardContent();
+                                    }}>Delete</Button>
+                                    <Button type="submit" variant="primary" className='mx-2' onClick={htmlToImg}>이미지로
+                                        내려받기</Button>
                                 </div>
-                            ))}
-                    </div>
-
-                </div>
-
-                    <div id="commentArea">
-                        <form id="commentForm" onSubmit={onCommentSubmit}>
-                            <div className="mb-3">
-                                {/*<div>{boardContent?.username}</div>*/}
+                            ) : null}
+                            <div id="commentArea">
+                                <form id="commentForm" onSubmit={onCommentSubmit}>
+                                    <div className="mb-3">
+                                        {/*<div>{boardContent?.username}</div>*/}
+                                    </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="commentContent" className="form-label">댓글 내용</label>
+                                        <textarea className="form-control" id="commentContent" name="commentContent"
+                                                  rows="3" value={comment}
+                                                  required onChange={(e) => onCommentInputChange(e)}></textarea>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary">댓글 작성</button>
+                                </form>
                             </div>
-                            <div className="mb-3">
-                                <label htmlFor="commentContent" className="form-label">댓글 내용</label>
-                                <textarea className="form-control" id="commentContent" name="commentContent" rows="3" value={comment}
-                                          required onChange={(e) => onCommentInputChange(e)}></textarea>
-                            </div>
-                            <button type="submit" className="btn btn-primary">댓글 작성</button>
-                        </form>
-                    </div>
-                    {username == boardContent.username && isLogined == true ? (
-                        <div className="mt-4 d-flex justify-content-center align-items-center">
-                            <Button type="button" className="btn btn-success mx-2" onClick={() => {
-                                handleEditBoardContent()
-                            }}>
-                                Edit
-                            </Button>
-                            <Button variant="danger" onClick={() => {
-                                handleDeleteBoardContent();
-                            }}>Delete</Button>
-                            <Button type="submit" variant="primary" className='mx-2' onClick={htmlToImg}>이미지로
-                                내려받기</Button>
                         </div>
-                    ) : null}
+                    </div>
                 </div>
             </div>
 
@@ -435,7 +454,7 @@ function BoardContent() {
                     <Modal.Body className='bg-danger text-white'>
                         <p>댓글을 삭제하시겠습니까?</p>
                         <Button variant="primary" onClick={() => {
-                            onDeleteSubmit();
+                            onDeleteCommentSubmit(showModalDeleteComment.commentId);
                             handleCloseModal()
                         }} className='mx-2'>
                             Yes

@@ -49,9 +49,7 @@ public class TokenController {
             System.out.println("db 의 리프레시 토큰이 사용자의 리프레시 토큰과 일치함");
             return jwtUtil.createJwt(userName, userRole, 60*60*10L, userId);
         }
-
         return "there are no same refreshToken";
-
     }
 }
 

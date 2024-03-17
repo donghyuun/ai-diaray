@@ -2,17 +2,11 @@ package com.example.springbackend.Controller;
 
 import com.example.springbackend.DTO.CommentDto;
 import com.example.springbackend.DTO.CommentModiDto;
-import com.example.springbackend.Entity.Board;
 import com.example.springbackend.Entity.Comment;
 import com.example.springbackend.Service.CommentService;
-import com.example.springbackend.repo.CommentRepo;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.crypto.Data;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin("http://localhost:3000")
@@ -52,12 +46,18 @@ public class CommentController {
     @PostMapping("/modify/comment")
     public Comment modifyComment(@RequestBody CommentModiDto commentModiDto) {
         System.out.println("post /modify/comment 도착");
-        System.out.println(commentModiDto.getBoardId());
+        System.out.println(commentModiDto.getBoardId()); //
         System.out.println(commentModiDto.getCommentId());
         System.out.println(commentModiDto.getContent());
 
         Comment modiComment = commentService.modify(commentModiDto);
         return modiComment;
     }
+
+    @DeleteMapping("/delete/comment/{id}")
+    public void deleteComment(@PathVariable("id") int commentId){
+        commentService.delete(commentId);
+    }
+
 
 }
