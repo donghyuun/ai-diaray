@@ -104,12 +104,25 @@ function User() {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8080/user', user);
-        console.log('User added');
-        setmessage('New user Added');
-        setalertColor("success")
-        getUsers(); // Fetch users again after adding a new user
-        handleCloseModal();
+        try {
+            await axios.post('http://localhost:8080/user', user);
+            console.log('User added');
+            setmessage('New user Added');
+            setalertColor("success")
+            getUsers(); // Fetch users again after adding a new user
+            handleCloseModal();
+        } catch (error) {
+            if (error.response && error.response.status === 409) {
+                console.log('Nickname already exists');
+                handleCloseModal();
+                setmessage('유저 이름이 이미 존재합니다');
+                setalertColor("danger")
+                // 여기서 setmessage와 setalertColor를 호출하여 사용자에게 메시지를 표시할 수 있음
+            } else {
+                console.error('Error adding user:', error);
+                // 에러 처리 로직을 추가할 수 있음
+            }
+        }
     };
 
     // 로그인 & 토큰 저장

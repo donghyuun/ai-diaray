@@ -2,6 +2,8 @@ package com.example.springbackend.Service;
 
 import com.example.springbackend.DTO.JoinDto;
 import com.example.springbackend.Entity.User;
+import com.example.springbackend.Exception.User.UserErrorCode;
+import com.example.springbackend.Exception.User.UserApiException;
 import com.example.springbackend.repo.UserRepo;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,7 +20,7 @@ public class JoinService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User joinProcess(JoinDto joinDto){
+    public User joinProcess(JoinDto joinDto) throws Exception {
         String username = joinDto.getUsername();
         String name = joinDto.getName();
         String password = joinDto.getPassword();
@@ -29,7 +31,7 @@ public class JoinService {
 
         //동일한 username의 회원이 존재할때
         if(isExist){
-            return null;
+            throw new UserApiException(UserErrorCode.CONFLICT_USER);
         }
 
         User user = new User();

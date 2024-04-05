@@ -3,7 +3,6 @@ package com.example.springbackend.Controller;
 import com.example.springbackend.DTO.BoardDto;
 import com.example.springbackend.DTO.BoardModifyDto;
 import com.example.springbackend.Entity.Board;
-import com.example.springbackend.Exception.UserNotFoundException;
 import com.example.springbackend.Service.BoardService;
 import com.example.springbackend.Service.ImageGeneratorService;
 import com.example.springbackend.Service.S3Service;
