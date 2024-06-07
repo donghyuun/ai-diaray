@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.56.0"
+  }
+}

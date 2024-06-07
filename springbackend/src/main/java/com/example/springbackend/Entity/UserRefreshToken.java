@@ -17,7 +17,7 @@ public class UserRefreshToken {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     private User user;
 
     private String refreshToken;

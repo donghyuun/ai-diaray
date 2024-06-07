@@ -11,6 +11,7 @@
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "USER_ID")
         private Long id;
         private String name;
         private String username;
@@ -18,10 +19,10 @@
         private String email;
         private String role;
 
-        @OneToOne(mappedBy = "user")
+        @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE) //유저 삭제 시 저장된 리프레시 토큰도 삭제
         private UserRefreshToken userRefreshToken;
 
-        @OneToMany(mappedBy = "user")
+        @OneToMany(mappedBy = "user") // 유저 삭제해도 댓글 기록은 남겨놓아야지..
         private List<Comment> commentList = new ArrayList<>();
 
         public Long getId() {

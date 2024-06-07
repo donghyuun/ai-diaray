@@ -13,7 +13,7 @@ import java.util.Date;
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private Long id;//댓글 pk
 
     private String username;
@@ -22,6 +22,7 @@ public class Comment {
     private Date modifiedDate; //수정일z
 
     @ManyToOne
+    @JoinColumn(name = "BOARD_ID") // 조인할 반대쪽 컬럼명
     private Board board;//게시글 번호 pk & fk
 
     @ManyToOne
